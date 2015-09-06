@@ -1,0 +1,336 @@
+*else_nochi
+	value = instr(today, , "Œã")
+	if value = -1 {
+		goto*else_tokidoki
+	}else{
+		goto*else4
+	}
+*else_tokidoki
+	value = instr(today, , "X")
+	if value = -1 {
+		goto*else0
+	}else{
+		goto*else7
+	}
+*else0
+	value = instr(today, , "°‚ê")
+	if value = -1 {
+		goto*else1
+	}else{
+		w="°‚ê"
+		goto*weather2
+	}
+*else1
+	value = instr(today, , "“Ü‚è")
+	if value = -1 {
+		goto*else2
+	}else{
+		w="“Ü‚è"
+		goto*weather2
+	}
+*else2
+	value = instr(today, , "‰J")
+	if value = -1 {
+		goto*else3
+	}else{
+		w="‰J"
+		goto*weather2
+	}
+*else3
+	value = instr(today, , "á")
+	if value = -1 {
+		goto*else4
+	}else{
+		w="á"
+		goto*weather2
+	}
+*else4
+	value = instr(today, , "°Œã“Ü")
+	if value = -1 {
+		goto*else5
+	}else{
+		w="°‚Ì‚¿“Ü"
+		goto*weather2
+	}
+*else5
+	value = instr(today, , "°Œã‰J")
+	if value = -1 {
+		goto*else6
+	}else{
+		w="°‚Ì‚¿“Ü"
+		goto*weather2
+	}
+*else6
+	value = instr(today, , "°Œãá")
+	if value = -1 {
+		goto*else10
+	}else{
+		w="°‚Ì‚¿“Ü"
+		goto*weather2
+	}
+*else7
+	value = instr(today, , "°X“Ü")
+	if value = -1 {
+		goto*else8
+	}else{
+		w="°‚Æ‚«‚Ç‚«“Ü"
+		goto*weather2
+	}
+*else8
+	value = instr(today, , "°X‰J")
+	if value = -1 {
+		goto*else9
+	}else{
+		w="°‚Æ‚«‚Ç‚«‰J"
+		goto*weather2
+	}
+*else9
+	value = instr(today, , "°Xá")
+	if value = -1 {
+		goto*else13
+	}else{
+		w="°‚Æ‚«‚Ç‚«“Ü"
+		goto*weather2
+	}
+*else10
+	value = instr(today, , "“ÜŒã°")
+	if value = -1 {
+		goto*else11
+	}else{
+		w="“Ü‚Ì‚¿°"
+		goto*weather2
+	}
+*else11
+	value = instr(today, , "“ÜŒã‰J")
+	if value = -1 {
+		goto*else12
+	}else{
+		w="“Ü‚Ì‚¿‰J"
+		goto*weather2
+	}
+*else12
+	value = instr(today, , "“ÜŒãá")
+	if value = -1 {
+		goto*else16
+	}else{
+		w="“Ü‚Ì‚¿á"
+		goto*weather2
+	}
+*else13
+	value = instr(today, , "“ÜX°")
+	if value = -1 {
+		goto*else14
+	}else{
+		w="“Ü‚Æ‚«‚Ç‚«°"
+		goto*weather2
+	}
+*else14
+	value = instr(today, , "“ÜX‰J")
+	if value = -1 {
+		goto*else15
+	}else{
+		w="“Ü‚Æ‚«‚Ç‚«‰J"
+		goto*weather2
+	}
+*else15
+	value = instr(today, , "“ÜXá")
+	if value = -1 {
+		goto*else19
+	}else{
+		w="“Ü‚Æ‚«‚Ç‚«á"
+		goto*weather2
+	}
+*else16
+	value = instr(today, , "‰JŒã°")
+	if value = -1 {
+		goto*else17
+	}else{
+		w="‰J‚Ì‚¿°"
+		goto*weather2
+	}
+*else17
+	value = instr(today, , "‰JŒã“Ü")
+	if value = -1 {
+		goto*else18
+	}else{
+		w="‰J‚Ì‚¿“Ü"
+		goto*weather2
+	}
+*else18
+	value = instr(today, , "‰JŒãá")
+	if value = -1 {
+		goto*else22
+	}else{
+		w="‰J‚Ì‚¿á"
+		goto*weather2
+	}
+*else19
+	value = instr(today, , "‰JX°")
+	if value = -1 {
+		goto*else20
+	}else{
+		w="‰J‚Æ‚«‚Ç‚«°"
+		goto*weather2
+	}
+*else20
+	value = instr(today, , "‰JX“Ü")
+	if value = -1 {
+		goto*else21
+	}else{
+		w="‰J‚Æ‚«‚Ç‚«“Ü"
+		goto*weather2
+	}
+*else21
+	value = instr(today, , "‰JXá")
+	if value = -1 {
+		goto*else22
+	}else{
+		w="‰J‚Æ‚«‚Ç‚«á"
+		goto*weather2
+	}
+*else22
+	value = instr(today, , "áŒã°")
+	if value = -1 {
+		goto*else23
+	}else{
+		w="á‚Ì‚¿°"
+		goto*weather2
+	}
+*else23
+	value = instr(today, , "áŒã“Ü")
+	if value = -1 {
+		goto*else24
+	}else{
+		w="á‚Ì‚¿“Ü"
+		goto*weather2
+	}
+*else24
+	value = instr(today, , "áŒã‰J")
+	if value = -1 {
+		goto*else25
+	}else{
+		w="á‚Ì‚¿‰J"
+		goto*weather2
+	}
+*else25
+	value = instr(today, , "áX°")
+	if value = -1 {
+		goto*else26
+	}else{
+		w="á‚Æ‚«‚Ç‚«°"
+		goto*weather2
+	}
+*else26
+	value = instr(today, , "áX“Ü")
+	if value = -1 {
+		goto*else27
+	}else{
+		w="á‚Æ‚«‚Ç‚«“Ü"
+		goto*weather2
+	}
+*else27
+	value = instr(today, , "áX‰J")
+	if value = -1 {
+		goto*else28
+	}else{
+		w="á‚Æ‚«‚Ç‚«‰J"
+		goto*weather2
+	}
+*else28
+	w="“V‹C‚ğæ“¾‚Å‚«‚Ü‚¹‚ñ"
+	goto*weather2
+*weather2
+	pos w_weatherx2,w_weathery2:gmode 0
+
+	if wd_haikei="sky"{
+		value=instr(today,,"°")
+		if value=-1{
+			goto*wh1
+		}else{
+			gcopy 174,0,0,250,104
+			color
+			goto*wh4
+		}
+	}else{
+		goto*wh4
+	}
+*wh1
+	value=instr(today,,"“Ü")
+	if value=-1:goto*wh2:else:gcopy 175,0,0,250,104:color:goto*wh4
+*wh2
+	value=instr(today,,"‰J")
+	if value=-1:goto*wh3:else:gcopy 175,0,0,250,104:color:goto*wh4
+*wh3
+	value=instr(today,,"á")
+	if value=-1:goto*wh4:else:gcopy 175,0,250,104:color:goto*wh4
+*wh4
+	if wd_haikei="color"{
+		if windowcolor="black":color
+		if windowcolor="blue":color 0,162,232
+		if windowcolor="pink":color 255,174,201
+		if windowcolor="white":color 255,255,255
+		if windowcolor="red":color 237,28,36
+		if windowcolor="green":color 181,230,29
+		if windowcolor="yellow":color 255,242,0
+		if windowcolor="orange":color 255,201,14
+		boxf w_weatherx2,w_weathery2,w_weatherx2+250,w_weathery2+104
+	
+		color 255,255,255
+		if windowcolor="white"|"yellow"|"orange":color
+	}
+	if wd_haikei="blue":color 0,128,255:boxf w_weatherx2,w_weathery2,w_weatherx2+250,w_weathery2+104 :color 255,255,255
+	if wd_haikei="green":color 0,128,0:boxf w_weatherx2,w_weathery2,w_weatherx2+250,w_weathery2+104 :color 255,255,255
+	if wd_haikei="hantoumei"{
+		gmode 3,,,128
+		color:boxfa w_weatherx2,w_weathery2,w_weatherx2+250,w_weathery2+104
+		color 255,255,255
+	}
+	
+	if strlen(city)>6{
+		font "’´‹É×ƒSƒVƒbƒN",26
+		pos w_weatherx2+10,w_weathery2+37:mes city
+		font "’´‹É×ƒSƒVƒbƒN",36
+	}else{
+		font "’´‹É×ƒSƒVƒbƒN",36
+		pos w_weatherx2+10,w_weathery2+30:mes city
+	}
+	
+	pos w_weatherx2+135,w_weathery2:gmode 2
+	if w="°‚ê":gcopy 146,0,5,90,90
+	if w="“Ü‚è":gcopy 147,0,5,90,90
+	if w="‰J":gcopy 148,0,5,90,90
+	if w="á":gcopy 149,0,5,90,90
+	if w="°‚Ì‚¿“Ü":gcopy 150,0,5,90,90
+	if w="°‚Ì‚¿‰J":gcopy 151,0,5,90,90
+	if w="°‚Ì‚¿á":gcopy 152,0,5,90,90
+	if w="°‚Æ‚«‚Ç‚«“Ü":gcopy 153,0,5,90,90
+	if w="°‚Æ‚«‚Ç‚«‰J":gcopy 154,0,5,90,90
+	if w="°‚Æ‚«‚Ç‚«á":gcopy 155,0,5,90,90
+	if w="“Ü‚Ì‚¿°":gcopy 156,0,5,90,90
+	if w="“Ü‚Ì‚¿‰J":gcopy 157,0,5,90,90
+	if w="“Ü‚Ì‚¿á":gcopy 158,0,5,90,90
+	if w="“Ü‚Æ‚«‚Ç‚«°":gcopy 159,0,5,90,90
+	if w="“Ü‚Æ‚«‚Ç‚«‰J":gcopy 160,0,5,90,90
+	if w="“Ü‚Æ‚«‚Ç‚«á":gcopy 161,0,5,90,90
+	if w="‰J‚Ì‚¿°":gcopy 162,0,5,90,90
+	if w="‰J‚Ì‚¿“Ü":gcopy 163,0,5,90,90
+	if w="‰J‚Ì‚¿á":gcopy 164,0,5,90,90
+	if w="‰J‚Æ‚«‚Ç‚«°":gcopy 165,0,5,90,90
+	if w="‰J‚Æ‚«‚Ç‚«“Ü":gcopy 166,0,5,90,90
+	if w="‰J‚Æ‚«‚Ç‚«á":gcopy 167,0,5,90,90
+	if w="á‚Ì‚¿°":gcopy 168,0,5,90,90
+	if w="á‚Ì‚¿“Ü":gcopy 169,0,5,90,90
+	if w="á‚Ì‚¿‰J":gcopy 170,0,5,90,90
+	if w="á‚Æ‚«‚Ç‚«°":gcopy 171,0,5,90,90
+	if w="á‚Æ‚«‚Ç‚«“Ü":gcopy 172,0,5,90,90
+	if w="á‚Æ‚«‚Ç‚«‰J":gcopy 173,0,5,90,90
+	
+	font "",12
+	if tenki_moji=1:pos w_weatherx2+185,w_weathery2+55:mes w
+	if tenki_yahoo=1:pos w_weatherx2+5,w_weathery2+90:mes"Powered by Yahoo Japan"
+	
+	font "’´‹É×ƒSƒVƒbƒN",26
+	pos w_weatherx2+140,w_weathery2+75:mes temperature
+	
+	font "",18//ƒtƒHƒ“ƒg‚ğŒ³‚É–ß‚·
+	return

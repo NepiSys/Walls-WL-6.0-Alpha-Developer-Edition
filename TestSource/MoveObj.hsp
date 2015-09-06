@@ -1,0 +1,88 @@
+#include "user32.as"
+#include "obj.as"
+#module
+#deffunc MoveObject array MoveObjectHwnd1,int MoveObjectFX1,int MoveObjectFY1 ,int MoveObjectspeed1,int MoveObjectlr1
+MoveObjectHwnd1=MoveObjectHwnd11
+MoveObjectFX=MoveObjectFX1
+MoveObjectFY=MoveObjectFY1
+MoveObjectspeed=MoveObjectspeed1
+MoveObjectlr=MoveObjectlr1
+
+	 repeat length(MoveObjectHwnd1)
+			 getobjsize MoveObjectPos,MoveObjectHwnd1.MoveObjectcnt1
+			 MoveObjectPosX.MoveObjectcnt1 = MoveObjectPos.2
+		     MoveObjectPosY.MoveObjectcnt1 = MoveObjectPos.3
+		     MoveObjectWidth.MoveObjectcnt1=MoveObjectPos.0
+		     MoveObjectHeigth.MoveObjectcnt1=MoveObjectPos.1
+		     MoveObjectcnt1++
+	 await
+	 loop
+repeat 
+	 repeat length(MoveObjectHwnd1)
+	 MoveObjectHwnd.cnt=objinfo(MoveObjectHwnd1.cnt,2)
+	 if(MoveObjectHwnd.cnt!=0){
+		SetWindowPos MoveObjectHwnd.cnt,0,MoveObjectPosX.cnt,MoveObjectPosY.cnt,0,0,1
+	 }
+	switch MoveObjectlr
+		case 0
+			if(MoveObjectPosX.cnt==MoveObjectFX){
+				return
+			}
+			MoveObjectPosX.cnt++
+			swbreak
+		case 1
+			if(MoveObjectPosX.cnt==MoveObjectFX){
+			return
+			}
+			MoveObjectPosX.cnt--
+			swbreak
+		case 2
+		if(MoveObjectPosY.cnt==MoveObjectFY){
+			return
+			}
+			MoveObjectPosY.cnt++
+			swbreak
+		case 3
+			if(MoveObjectPosY.cnt==MoveObjectFY){
+				return
+			}
+			MoveObjectPosY.cnt--
+			swbreak
+		case 4
+			if(MoveObjectPosX.cnt==MoveObjectFX &&MoveObjectPosY.cnt==MoveObjectFY  ){
+				return
+			}	
+			MoveObjectPosX.cnt++
+			MoveObjectPosY.cnt++
+			swbreak
+		case 5
+		 if(MoveObjectPosX.cnt==MoveObjectFX &&MoveObjectPosY.cnt==MoveObjectFY  ){
+				return
+			}	
+			MoveObjectPosX.cnt--
+			MoveObjectPosY.cnt--
+			swbreak
+		case 6
+			if(MoveObjectPosX.cnt==MoveObjectFX &&MoveObjectPosY.cnt==MoveObjectFY  ){
+				return
+			}	
+			MoveObjectPosX.cnt--
+			MoveObjectPosY.cnt++
+			swbreak
+		case 7
+			if(MoveObjectPosX.cnt==MoveObjectFX &&MoveObjectPosY.cnt==MoveObjectFY  ){
+				return
+			}	
+			MoveObjectPosX.cnt++
+			MoveObjectPosY.cnt--
+			swbreak
+	swend
+	await MoveObjectspeed
+	loop
+loop
+return
+
+#global
+input a,100,100
+stats=stat
+Moveobject stats,400,400,1,0

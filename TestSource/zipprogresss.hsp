@@ -1,0 +1,30 @@
+#uselib "user32.dll"
+#func RegisterWindowMessage "RegisterWindowMessageA" str
+#uselib "nepextkernel.dll"
+#cfunc SevenZip "SevenZip" int, str, var, int
+#func SevenZipSetBackGroundMode "SevenZipSetBackGroundMode" int
+#func SevenZipSetOwnerWindow "SevenZipSetOwnerWindow" int
+RegisterWindowMessage("wm_arcextract")
+oncmd gosub *arcextract,stat
+SevenZipSetOwnerWindow hwnd
+sdim result, 256
+cmd="-hide -aoa e  zip"
+winobj "msctls_progress32", "", , $50000000, 200, 20
+hProgress = objinfo(stat, 2)
+SevenZipSetBackGroundMode( 1 )	
+zip=SevenZip(hwnd,cmd,result,256)
+dialog zip
+stop
+
+*arcextract
+
+	if(wparam == 1){
+
+	dupptr EXTRACTINGINFO,lparam,12
+	dwFileSize = EXTRACTINGINFO.0
+	dwWriteSize= EXTRACTINGINFO.1
+	progress=int(0.1*dwWriteSize/dwFileSize*10*100)
+	sendmsg hProgress, $402, progress
+	}
+
+	return

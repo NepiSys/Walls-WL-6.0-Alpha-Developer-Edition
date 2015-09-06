@@ -1,0 +1,43 @@
+*home
+	cls
+	mmstop
+	screen 0,430,180
+	title"ラーメンタイマー"
+	mes"ラーメンの所要時間を選んでください。"
+	button"1分",*one:mes"Quick1(明星)など
+	button"3分",*three:mes"カップヌードル(日清)、どん兵衛そば(日清)、\n緑のたぬき(東洋水産)U.F.O(日清)、ぺヤング(まるか)など
+	button"5分",*five:mes"どん兵衛うどん(日清)、赤いきつね(東洋水産)など
+	stop
+*one
+	repeat
+	cls
+	mes"現在計っています。"
+	byou=byou-1
+	if byou<0 :byou=60
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"1分たちました。":title"おいしくお召し上がりください":stop
+	mes ""+byou+"秒"
+	title"残り"+byou+"秒"
+	wait 100
+	loop
+*three
+	repeat
+	cls
+	mes"現在計っています。"
+	byou=byou-1
+	if byou<0 :byou=180
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"3分たちました。":title"おいしくお召し上がりください":stop
+	mes ""+byou+"秒"
+	title"残り"+byou+"秒"
+	wait 100
+	loop
+*five
+	repeat
+	cls
+	mes"現在計っています。"
+	byou=byou-1
+	if byou<0 :byou=300
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"5分たちました。":title"おいしくお召し上がりください":stop
+	mes ""+byou+"秒"
+	title"残り"+byou+"秒"
+	wait 100
+	loop

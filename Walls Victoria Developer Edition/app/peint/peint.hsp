@@ -1,0 +1,62 @@
+	title"Walls ペイント0,1"
+*paint
+	cls
+	screen 0,800,500
+*paint2
+	objsize 50,20
+	pos 10,10:button"読込",*paintload
+	pos 60,10:button"保存",*paintsave
+	pos 110,10:button"色",*color_change
+	pos 160,10:button"ペン",*pen_on
+	pos 210,10:button"消しゴム",*eraser_on
+	pos 260,10:button"スポイト",*spoit_on
+	pos 310,10:button"クリア",*clear
+	pos 360,10:button"終了",*exit
+	pen=1
+	goto*peintmain
+*exit
+	end
+*peintmain
+	gsel 0
+	stick key,256
+	if (key & 256):{
+		if pen=1:color r,g,b:line x,y,mousex,mousey
+		if era=1:color 255,255,255:boxf mousex-4,mousey-4,mousex+4,mousey+4
+		if spo=1:pget mousex,mousey:r=ginfo_r:g=ginfo_g:b=ginfo_b:spo=0:pen=1
+	}
+	x=mousex
+	y=mousey
+	await 1
+	goto *peintmain
+*color_change
+	dialog"",33:r=ginfo_r:g=ginfo_g:b=ginfo_b
+	goto *peintmain
+*pen_on
+	pen=1
+	era=0
+	spo=0
+	goto *paint2
+*eraser_on
+	dialog"システム上の問題により、消しゴム機能は使えません。\n「色」から「白」を選んで、消しゴムの代わりに使ってください。"
+	goto*color_change
+*spoit_on
+	pen=0
+	era=0
+	spo=1
+	goto *paint2
+*paintsave
+	dialog"",17
+	if stat=0:goto *paint
+	bmpsave refstr+".jpg"
+	mouse x,y
+	goto *paint2
+*paintload
+	dialog"bmp;*.gif;*.jpg;*.png;*tif",16
+	if stat=0:goto *paint2
+	picload refstr
+	mouse x,y
+	goto *paint2
+*clear
+	cls
+	goto*paint
+	stop

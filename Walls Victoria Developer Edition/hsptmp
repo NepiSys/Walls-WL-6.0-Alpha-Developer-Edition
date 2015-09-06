@@ -1,0 +1,4780 @@
+;Walls Victoria
+;Yotiosoft 2014-2015
+
+/////////////////解説/////////////////
+// 変数について（○にはそれぞれ違う文字が入ります）
+//
+// now:今開いているタブ
+// oldnow:前開いていたタブ
+// titlename:Wallsのタイトル
+// varsion:Wallsのバージョン
+// install:インストールされたか、されてないか
+// shoki〇〇:初期設定時の変数
+// hantoumei:ウィンドウの半透明度
+// haikei:背景番号、または画像のある場所
+// userphotoname:ユーザー画像番号
+// i○:タスクバーのアイコンの表示の有無
+// i○x:タスクバーのアイコンの位置
+// buttoncolor:ボタンの色
+// gatsu:gettime(1)で取得した「月」
+// nichi:gettime(3)で取得した「日」
+// youbi0:gettime(2)で取得した番号
+// youbi:youbi(0)を日本語に直したもの
+// hyoji:お知らせで取得した内容
+// uname:ユーザー名
+// x:タスクバーで一番右側に表示されているアイコンの右端の位
+// sc_○○:ショートカット（ShortCut）関係
+// sub:サブルーチンの有無（0＝OFF、1＝ON　デフォルトではOFF）
+// s_e:サーチエンジンetc
+// restart:再起動の有無（再起動後＝1）
+// iod:デスクトップでのお知らせの表示設定。0でOFF、1でON（デフォルト）。infomation_on_desktopの略
+// notopenw:NOT OPEN Windowの略。ウィンドウが開かれていない場合は1、window.hsp（ウィンドウの表示コード）で0になる
+// ksk:KaSoKu。アニメーションの加速時などに使う
+//
+//////////////////////////
+// 関数について
+//
+// buttons:最小化ボタン、閉じるボタンの設置（close変数は閉じるボタンを押した時のラベルジャンプ先）
+// errors:エラー時の内容表示
+// configsave:設定ファイルの保存
+// put_icon:アイコンの位置情報の読み込み
+// clock:タスクバー右端の時計の表示
+///////////////////////////////////////////////////
+*bios
+	screen 0,1024,576
+	onexit*exit
+	mmstop
+	//バージョンとタイトルを読み込み--------------------------------------------------------------------
+	notesel vt
+	noteload "data/jouhou.txt"//detaフォルダ内のjouhou.txt読み込み
+	noteget titlename , 0;jouhou.txtの1行目に書かれたWallsのバージョンを読み込み、versionに一時保存
+	noteget version , 1;jouhou.txtの2行目に書かれたWallsのタイトルを読み込み、titlenameに一時保存
+	noteget build,2;ビルド番号
+	//---------------------------------------------------------------------------------------------------
+	title titlename
+	color 0,0,0:boxf
+	
+	notesel install
+	noteload "data/install.txt"
+	
+	if install="yet"|install="yet2"{;install.txtのファイルに"yet"と書き込まれていたら（初期設定をまだ行っていない場合）
+		celload "img/waku_button.png",70
+		gsel
+		color 0,128,255:boxf
+		wait 100
+		color 255,255,255:pos 320,200
+		font "",36
+		mes""+titlename+"へようこそ！"
+		pos 330,240:font "",20:mes"これから簡単なユーザー設定を行います。"
+		font "",0//元のフォントの大きさに戻す
+		pos 420,280
+		objimage 70,0,0,0,180,0,90
+		objsize 180,90
+		button"",*shoki_name
+		stop
+		}else{
+			goto*bios2
+		}
+*shoki_name
+	clrobj
+	//ビデオ再生
+	pos 0,0
+	mmload "img/welcome.wmv",1,1
+	mmplay 1
+	
+	color 0,128,255:boxf
+	color 0,255,0:boxf 650,500,850,576
+	pos 680,515:color 255,255,255:mes"ステップ2/3:\nパスワード設定"
+	color 255,128,0:boxf 850,500,1024,576
+	pos 860,515:color 255,255,255:mes"ステップ3/3:\nファイルの自動設定"
+	;ユーザー名の初期設定
+		color 255,255,255
+		pos 10,515:mes"ステップ1/3:\nユーザー名を入力してください。\nユーザー名はあとから変更することもできます。"
+		shokiname="Admin"
+		objimage
+		pos 250,520
+		objsize 300,20:input shokiname
+		objsize 50,20
+		pos 550,520
+		button"OK",*shoki_pass
+	stop
+*shoki_pass
+	;パスワードの初期設定
+	shokipass=""
+	clrobj
+	color 0,128,255:boxf
+	greenx=650
+	color 255,128,0:boxf 850,500,1024,576
+	pos 860,515:color 255,255,255:mes"ステップ3/3:\nファイルの自動設定"
+	repeat 57
+	greenx=greenx-10
+	color 0,255,0:boxf greenx,500,850,576
+	wait 3
+	loop
+	pos 90,515:color 255,255,255:mes"ステップ2/3:\n新しいパスワードを入力してください。\nなるべく自分にしか解らないものにしましょう。（設定しない場合は空欄にしておいてください）"
+		pos 400,520:objsize 300,20:input shokipass
+		objsize 50,20
+		pos 700,520
+		button"OK",*installing
+	stop
+*installing
+	clrobj
+	color 0,255,0:boxf 80,500,850,576
+	orangex=850
+	repeat 65
+	orangex=orangex-10
+	color 255,128,0:boxf orangex,500,1024,576
+	wait 3
+	loop
+	color 255,255,255
+	pos 210,525:mes"ステップ3/3:\n初期設定中..."
+	;------------------------ファイル設定-------------------------------
+	;デフォルトの状態に設定を変更
+	notesel conf
+		noteadd "Walls 設定ファイル",0,1
+		noteadd "<ユーザー画像>",1,1
+		noteadd "1",2,1
+		noteadd "<背景>",3,1
+		noteadd "11",4,1
+		noteadd "<ウィンドウの色>",5,1
+		noteadd "black",6,1
+		noteadd "<ユーザー名>",7,1
+		noteadd shokiname,8,1
+		noteadd "<開発者モード>",9,1
+		noteadd "0",10,1
+		noteadd "<非透明度>",11,1
+		noteadd "100",12,1
+		noteadd "<背景画像の場所>",13,1
+		noteadd "",14,1
+		noteadd "<サーチエンジン>",15,1
+		noteadd "http://www.google.co.jp/",16,1
+		noteadd "<スタートメニューの大きさ>",17,1
+		noteadd "big",18,1
+		noteadd "<時報音>",19,1
+		noteadd "clock",20,1
+		noteadd "<時計フォント>",21,1
+		noteadd "c",22,1
+		noteadd "<天気予報ウィジェットの背景>",23,1
+		noteadd "no",24,1
+		noteadd "<天気の文字表示（天気予報ウィジェット）>",25,1
+		noteadd "1",26,1
+		noteadd "<Powered by Yahoo Japanの表示（天気予報ウィジェット）>",27,1
+		noteadd "1",28,1
+		noteadd "<デスクトップでのお知らせの表示>",29,1
+		noteadd "1",30,1
+	notesave "data/config.dat";書き込み
+	
+	if shokipass="":shokipass="password:no"
+	notesel shokipass
+	notesave "data/pass.txt"
+	
+	if install="yet2":delete"walls update.exe"
+	
+	//ショートカットの初期設定
+	notesel short
+	
+	noteadd "<mycon>",0,1
+	noteadd "1",1,1
+	noteadd "1",2,1:noteadd "1",3,1
+	sc_mycon=1
+	
+	noteadd "<app>",4,1
+	noteadd "1",5,1
+	noteadd "1",6,1:noteadd "2",7,1
+	sc_app=1
+	
+	noteadd "<cp>",8,1
+	noteadd "1",9,1
+	noteadd "1",10,1:noteadd "3",11,1
+	sc_cp=1
+	
+	noteadd "<game>",12,1
+	noteadd "0",13,1
+	noteadd "0",14,1:noteadd "0",15,1
+	sc_game=0
+	
+	noteadd "<krone>",16,1
+	noteadd "1",17,1
+	noteadd "2",18,1:noteadd "1",19,1
+	sc_krone=1
+	
+	noteadd "<MusicPlayer>",20,1
+	noteadd "1",21,1
+	noteadd "2",22,1:noteadd "2",23,1
+	sc_mp=1
+	
+	noteadd "<dentaku>",24,1
+	noteadd "0",25,1
+	noteadd "0",26,1:noteadd "0",27,1
+	sc_dentaku=0
+	
+	noteadd "<tetris>",28,1
+	noteadd "0",29,1
+	noteadd "0",30,1:noteadd "0",31,1
+	sc_tetris=0
+	
+	noteadd "<twitter>",32,1
+	noteadd "0",33,1
+	noteadd "0",34,1:noteadd "0",35,1
+	sc_twitter=0
+	
+	noteadd "<facebook>",36,1
+	noteadd "0",37,1
+	noteadd "0",38,1:noteadd "0",39,1
+	sc_facebook=0
+	
+	noteadd "<Widget_bigclock>",40,1
+	noteadd "1",41,1
+	noteadd "9",42,1:noteadd "1",43,1
+	w_bclock=0
+	
+	noteadd "<Widget_smallclock>",44,1
+	noteadd "0",45,1
+	noteadd "0",46,1:noteadd "0",47,1
+	w_sclock=0
+	
+	noteadd "<Widget_SearchBox>",48,1
+	noteadd "1",49,1
+	noteadd "9",50,1:noteadd "4",51,1
+	w_search=1
+	
+	noteadd "<Widget_Weather>",52,1
+	noteadd "1",53,1
+	noteadd "9",54,1:noteadd "7",55,1
+	w_weather=1
+	
+	notesave "data/shortcut.txt"
+	
+	//ここはバージョンによって異なる//
+		notesel vn
+		noteadd "5101",0,1//Build 5000なので5000
+		noteadd "Walls Victoria Beta2.exe"//現在の実行アプリ名（アップデート時に使う）
+		notesave "data/vn.txt"
+	/////////////////////////////////
+	
+	installzumi="done"
+	notesel installzumi
+	notesave "data/install.txt" ;インストール完了記録
+	
+	new=1//初期設定後
+	
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515:mes"インストールが完了しました！今からWallsはあなたのものです。\n再起動する前にチュートリアルを受けることができます。チュートリアルを受けますか？"
+	pos 910,520:objsize 50,20:button"はい",*tutorial
+	pos 960,520:objsize 50,20:button"いいえ",*bios
+	stop
+*tutorial
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	if shokipass2=""{
+		pos 210,515
+		mes"起動すると、まずファイルの読み込みが行われます。\n"+shokiname2+"さんはパスワードを設定されていないので、\nそのままデスクトップ画面が表示されます。"
+	}else{
+		pos 210,515
+		mes"起動すると、まずファイルの読み込みが行われます。\n"+shokiname2+"さんはパスワードを設定されたので、\n次にログイン画面が表示されます。
+	}
+	pos 910,510:objsize 100,30:button"次へ",*tutorial2
+	stop
+*tutorial2
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"起動したら、まずはスタートメニューを押してみましょう。左下のボタンです"
+	pos 210,540
+	
+	celload"ico/start.png"
+	gcopy 1,0,0,30,30
+	pos 910,510:objsize 100,30:button"次へ",*tutorial3
+	stop
+*tutorial3
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"色々なボタンが表示されます。\n多くの機能は、スタートメニューから利用できます。"
+	pos 910,510:objsize 100,30:button"次へ",*tutorial4
+	stop
+*tutorial4
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"「コントロールパネル」は、日本語で言うと「設定」です。\nここでいろいろな設定を変更することができます。"
+	pos 910,510:objsize 100,30:button"次へ",*tutorial5
+	stop
+*tutorial5
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"「設定の初期化」を押すと、設定が初期状態に戻り、再び今の初期設定に戻ります。"
+	pos 910,510:objsize 100,30:button"次へ",*tutorial6
+	stop
+*tutorial6
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"アップデートされた場合、「アップデート」を押すと\n最新版のWallsに更新できます。"
+	pos 910,510:objsize 100,30:button"次へ",*tutorial7
+	stop
+*tutorial7
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"新しいWallsには「ウィジェット」というものがあり、\nデスクトップ画面に時計や特殊なボタンなどを設置することができます。\n設置位置はコントロールパネルで設定できます。"
+	pos 910,510:objsize 100,30:button"次へ",*tutorial8
+	stop
+*tutorial8
+	clrobj
+	color 255,128,0:boxf 200,500,1024,576
+	color 255,255,255
+	pos 210,515
+	mes"以上でチュートリアルは終了です。\n新しいWallsを是非お楽しみください。"
+	pos 910,510:objsize 100,30:button"再起動",*bios
+	stop
+*bios2
+	buffer 99
+	picload"img/logo.png"
+	gsel 
+	;----------------------------------------------------------------------------------------------------------------
+	goto*load
+	#deffunc boxfa int ax, int ay, int bx, int by //半透明色関数の登録
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	return
+*load
+	p=0
+;----------------------------------------------------------------
+	redraw 0
+	repeat 576
+		if p=576:break
+		color 0,cnt,255-cnt
+		boxf 0,p,1024,p+4
+		p=p+4
+		wait 1
+	loop
+	redraw 1
+	repeat 10
+		color 255,242,0:gmode 4,,,128
+		boxfa 460,217,520,308
+		wait 5
+	loop
+	
+	;-------------------------色々なファイルを読み込み-----------------------------------------
+	//チェックボタンに使う//////////////////////////
+	#include "user32.as"
+	#define WM_NCLBUTTONDOWN $000000A1
+	#define HTCAPTION 2
+	#cfunc GetSysColorBrush2 "GetSysColorBrush" int
+	#define WM_CTLCOLORSTATIC 0x138
+	/////////////////////////////////////////////////
+	
+	//////////設定ファイル読み込み//////////
+	notesel passw
+	noteload"data/pass.txt"
+	
+	notesel buf
+	noteload "data/config.dat"
+	
+	sdim data, 256
+	
+	noteget userphotoload,2
+	noteget haikei,4
+	noteget windowcolor,6
+	noteget uname,8
+	noteget devmode,10
+	noteget hantoumei0,12
+	noteget gazo,14
+	noteget search,16
+	noteget sm,18
+	noteget jihouon,20
+	noteget clockfont,22
+	noteget wd_haikei,24
+	noteget tenki_moji,26
+	noteget tenki_yahoo,28
+	noteget iod,30
+	
+	hantoumei=int(hantoumei0)
+	iod=int(iod)
+	//開発者モード設定読み込み
+	notesel devs
+	noteload "data/developermode.txt"
+	noteget dev_error,1
+	noteget dev_label,3
+	/////////////////////////////////////////////
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*load)"
+	
+	//フォントの埋め込み
+	#epack "data/chogokubosogothic_5.ttf"
+	#epack "data/mplus-1c-thin.ttf"
+	#include "gdi32.as"
+	notesel buf
+	noteload "data/chogokubosogothic_5.ttf"
+	AddFontMemResourceEx varptr(buf), strsize, 0, varptr(pcFonts)
+	hFont = stat ; フォントハンドル
+	
+	notesel buf
+	noteload "data/mplus-1c-thin.ttf"
+	AddFontMemResourceEx varptr(buf), strsize, 0, varptr(pcFonts)
+	hFont = stat ; フォントハンドル
+	
+	//地域設定読み込み
+	notesel buf
+	noteload"data/liveplace.txt"
+	noteget city,0
+	noteget city_number,1
+	city_number=int(city_number)
+	
+	//ウィンドウの色を読み込み
+	if windowcolor="black":r=0:g=0:b=0
+	if windowcolor="blue":r=0:g=162:b=232
+	if windowcolor="pink":r=255:g=174:b=201
+	if windowcolor="white":r=255:g=255:b=255
+	if windowcolor="red":r=237:g=28:b=36
+	if windowcolor="green":r=181:g=230:b=29
+	if windowcolor="yellow":r=255:g=242:b=0
+	if windowcolor="orange":r=255:g=201:b=14
+	
+	;スタイルの読み込み
+	styleload="1"
+	
+	if userphotoload="1":userphotoload2="img/userphoto1.png";もしもuserphotoload=1ならuserphotoload2(buffer 69)は"img/userphoto1.png"
+	if userphotoload="2":userphotoload2="img/userphoto2.png"
+	if userphotoload="3":userphotoload2="img/userphoto3.png"
+	if userphotoload="4":userphotoload2="img/userphoto4.png"
+	if userphotoload="5":userphotoload2="img/userphoto5.png"
+	if userphotoload="6":userphotoload2="img/userphoto6.png"
+	if userphotoload="7":userphotoload2="img/userphoto7.png"
+	if userphotoload="8":userphotoload2="img/userphoto8.png"
+	if userphotoload="9":userphotoload2="img/userphoto9.png"
+	
+	if str(haikei)="gazo":kabegami="desktop/desktop1.jpg"//kabegami変数に何も入れないとエラーが発生するためとりあえず"desktop/desktop1.jpg"を入れておく
+	
+	;背景画像の番号読み込み
+	if haikei=1:kabegami="desktop/desktop1.jpg"
+	if haikei=2:kabegami="desktop/desktop2.jpg"
+	if haikei=3:kabegami="desktop/desktop3.jpg"
+	if haikei=4:kabegami="desktop/desktop4.jpg"
+	if haikei=5:kabegami="desktop/desktop5.jpg"
+	if haikei=6:kabegami="desktop/desktop6.jpg"
+	if haikei=7:kabegami="desktop/desktop7.jpg"
+	if haikei=8:kabegami="desktop/desktop8.jpg"
+	if haikei=9:kabegami="desktop/desktop9.jpg"
+	if haikei=10:kabegami="desktop/desktop10.jpg"
+	if haikei=11:kabegami="desktop/desktop11.jpg"
+	if haikei=12:kabegami="desktop/desktop12.jpg"
+	if haikei=13:kabegami="desktop/desktop13.jpg"
+	if haikei=14:kabegami="desktop/desktop14.jpg"
+	if haikei=15:kabegami="desktop/desktop15.jpg"
+	if haikei=16:kabegami="desktop/desktop16.jpg"
+	if haikei=17:kabegami="desktop/desktop17.jpg"
+	if haikei=18:kabegami="desktop/desktop18.jpg"
+	if haikei=19:kabegami="desktop/desktop19.jpg"
+	if haikei=20:kabegami="desktop/desktop20.png"
+	if haikei=21:kabegami="desktop/desktop21.png"
+	if haikei=22:kabegami="desktop/desktop22.png"
+	if haikei=23:kabegami="desktop/desktop23.png"
+	if haikei=24:kabegami="desktop/desktop24.png"
+	if haikei=25:kabegami="desktop/desktop25.png"
+	if haikei=26:kabegami="desktop/desktop26.png"
+	
+	#include "buffer.hsp"
+	;--------------------------------------
+	repeat 10
+		color 34,177,76:gmode 4,,,128
+		boxfa 477,228,536,308
+		wait 5
+	loop
+	;------------------------------YotioSoftからのお知らせを受信-------------------------------------------
+	#include "hspinet.as"
+	alloc buf,1024*1024
+
+	netinit										;	プラグインの初期化
+
+	neturl "http://joogle.web.fc2.com/datacenter/infomation/"
+
+	netdlname "data/info.txt"						;	ダウンロード後のファイル名
+	netrequest "info.txt"						;	ファイル名の指定（ここで指定する）
+	
+	repeat
+		exist "info.txt"
+		netexec res
+		if res : break
+		await 50
+	loop
+
+	netterm										;	プラグインの開放
+	
+	repeat 10
+		color 237,28,36:gmode 4,,,128
+		boxfa 497,248,543,308
+		wait 5
+	loop
+	
+	//天気予報を取得（再起動時はスキップ）
+	if restart=0{
+		// RSSのURL
+		url="http://rss.weather.yahoo.co.jp/rss/days/"+city_number+".xml"
+		// RSSのロード
+		rssload desc,link,url,6
+		if stat=1 : dialog "天気予報の取得に失敗しました。" : notget=1 :goto*afterload
+		
+		foreach desc
+		loop
+		
+		notesel desc(1)
+		notesave "data/weather.txt"
+		notesel today
+		noteload "data/weather.txt"
+		
+		repeat 2
+				getstr today_kion0, today, i, '- '
+				if strsize = 0 : break
+				i += strsize
+			loop
+			notesel today_kion0
+			notesave "data/today_h.txt"
+			
+			notesel today_kion
+			noteload "data/today_h.txt"
+			
+			today_high=strmid(today_kion, 0, 3)
+				today_high=int(today_high)
+				if today_high<10:today_high=strmid(today_kion, 1,1):hlow=1
+				today_high=""+(today_high)+"°"
+				
+			today_low=strmid(today_kion, 6, 3)
+				today_low=int(today_low)
+				if today_low<10{
+					if hlow=1:today_low=strmid(today_kion, 5,1)
+					if hlow=0:today_low=strmid(today_kion, 6,1)
+				}
+				today_low=""+(today_low)+"°"
+		
+			temperature=""+today_high+"/"+today_low+""
+	}
+*afterload
+	repeat 10
+		color 0,162,232:gmode 4,,,128
+		boxfa 520,262,559,308
+		wait 5
+	loop
+
+	xl=1024
+	ksk=1
+	repeat
+		if xl<0:break
+		ksk=ksk*2
+		xl=xl-ksk
+		color 0,100,255:boxf xl,0,1024,576
+		wait 8
+	loop
+	
+	//Welcome!と表示させる
+	welcomey=0
+	gsk=250
+	repeat
+	redraw 0
+		color 0,100,255:boxf
+		gsk=gsk/2
+		welcomey=welcomey+gsk //最終的には450,244で止まる
+		color 255,255,255:font "",36
+		pos 450,welcomey
+		mes"Welcome!"
+		if welcomey=244:break
+		wait 5
+	redraw 1
+	loop
+	wait 200
+	
+	welcomex=450
+	ksk=1
+	repeat
+	redraw 0
+		if welcomex<-100:break
+		color 0,100,255:boxf
+		ksk=ksk*2
+		welcomex=welcomex-ksk
+		color 255,255,255:font "",36
+		pos welcomex,244
+		mes"Welcome!"
+		wait 5
+	redraw 1
+	loop
+	
+	font "",18
+	sub=0;sub変数をリセット
+	wait 200
+	goto*passin
+	
+///////////////////関数の登録/////////////////////
+#deffunc buttons
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",close
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	return
+	
+#deffunc errors
+	font "",24
+	color 255,255,255
+	pos 410,400:mes"エラーが発生しました"
+	font "",
+	return
+	
+#deffunc configsave
+	notesel buf
+		noteadd "Walls 設定ファイル",0,1
+		noteadd "<ユーザー画像>",1,1
+		noteadd userphotoload,2,1
+		noteadd "<背景>",3,1
+		noteadd haikei,4,1
+		noteadd "<ウィンドウの色>",5,1
+		noteadd windowcolor,6,1
+		noteadd "<ユーザー名>",7,1
+		noteadd uname,8,1
+		noteadd "<開発者モード>",9,1
+		noteadd ""+devmode+"",10,1
+		noteadd "<非透明度>",11,1
+		noteadd hantoumei0,12,1
+		noteadd "<背景画像の場所>",13,1
+		noteadd gazo,14,1
+		noteadd "<サーチエンジン>",15,1
+		noteadd search,16,1
+		noteadd "<スタートメニューの大きさ>",17,1
+		noteadd sm,18,1
+		noteadd "<時報音>",19,1
+		noteadd jihouon,20,1
+		noteadd "<時計フォント>",21,1
+		noteadd clockfont,22,1
+		noteadd "<天気予報ウィジェットの背景>",23,1
+		noteadd wd_haikei,24,1
+		noteadd "<天気の文字表示（天気予報ウィジェット）>",25,1
+		noteadd str(tenki_moji),26,1
+		noteadd "<Powered by Yahoo Japanの表示（天気予報ウィジェット）>",27,1
+		noteadd str(tenki_yahoo),28,1
+		noteadd "<デスクトップでのお知らせの表示>",29,1
+		noteadd str(iod),30,1
+	
+		if nonmessage=0:pos 850,70:color 0,128,255:mes"設定しました":color
+		if nonmessage=1:nonmessage=0
+		return
+	
+#deffunc put_icon
+	notesel buf
+	noteload "data/shortcut.txt"
+	
+	sdim data, 256
+	
+	noteget shortcuts,1
+		if shortcuts=1{
+			sc_mycon=1
+			noteget sc_myconx,2:sc_myconx2=70*sc_myconx : noteget sc_mycony,3:sc_mycony2=60*sc_mycony
+		}
+	noteget shortcuts,5
+		if shortcuts=1{
+			sc_app=1
+			noteget sc_appx,6:sc_appx2=70*sc_appx : noteget sc_appy,7:sc_appy2=60*sc_appy
+		}
+	noteget shortcuts,9
+		if shortcuts=1{
+			sc_cp=1
+			noteget sc_cpx,10:sc_cpx2=70*sc_cpx : noteget sc_cpy,11:sc_cpy2=60*sc_cpy
+		}
+	noteget shortcuts,13
+		if shortcuts=1{
+			sc_game=1
+			noteget sc_gamex,14:sc_gamex2=70*sc_gamex : noteget sc_gamey,15:sc_gamey2=60*sc_gamey
+		}
+	noteget shortcuts,17
+		if shortcuts=1{
+			sc_krone=1
+			noteget sc_kronex,18:sc_kronex2=70*sc_kronex : noteget sc_kroney,19:sc_kroney2=60*sc_kroney
+		}
+	noteget shortcuts,21
+		if shortcuts=1{
+			sc_mp=1
+			noteget sc_mpx,22:sc_mpx2=70*sc_mpx : noteget sc_mpy,23:sc_mpy2=60*sc_mpy
+		}
+	noteget shortcuts,25
+		if shortcuts=1{
+			sc_dentaku=1
+			noteget sc_dentakux,26:sc_dentakux2=70*sc_dentakux : noteget sc_dentakuy,27:sc_dentakuy2=60*sc_dentakuy
+		}
+	noteget shortcuts,29
+		if shortcuts=1{
+			sc_tetris=1
+			noteget sc_tetrisx,30:sc_tetrisx2=70*sc_tetrisx : noteget sc_tetrisy,31:sc_tetrisy2=60*sc_tetrisy
+		}
+	noteget shortcuts,33
+		if shortcuts=1{
+			sc_twitter=1
+			noteget sc_twitterx,34:sc_twitterx2=70*sc_twitterx : noteget sc_twittery,35:sc_twittery2=60*sc_twittery
+		}
+	noteget shortcuts,37
+		if shortcuts=1{
+			sc_facebook=1
+			noteget sc_facebookx,38:sc_facebookx2=70*sc_facebookx : noteget sc_facebooky,39:sc_facebooky2=60*sc_facebooky
+		}
+	noteget shortcuts,41
+		if shortcuts=1{
+			w_bclock=1
+			noteget w_bclockx,42:w_bclockx2=70*w_bclockx : noteget w_bclocky,43:w_bclocky2=60*w_bclocky
+		}
+	noteget shortcuts,45
+		if shortcuts=1{
+			w_sclock=1
+			noteget w_sclockx,46:w_sclockx2=70*w_sclockx : noteget w_sclocky,47:w_sclocky2=60*w_sclocky
+		}
+	noteget shortcuts,49
+		if shortcuts=1{
+			w_search=1
+			noteget w_searchx,50:w_searchx2=70*w_searchx : noteget w_searchy,51:w_searchy2=60*w_searchy
+		}
+	noteget shortcuts,53
+		if shortcuts=1{
+			w_weather=1
+			noteget w_weatherx,54:w_weatherx2=70*w_weatherx : noteget w_weathery,55:w_weathery2=60*w_weathery
+		}
+		return
+
+#deffunc place_save
+	notesel data:noteadd buf,0,1:noteadd w_url,1,1:notesave"data/liveplace.txt"
+	dialog"設定しました。再起動しますか？",2
+	if stat=6:goto*restart2
+	if stat=7:stop
+	
+#deffunc clock
+	repeat
+		pos 945,550
+		gcopy 15,945,550,1024,576
+		;--------------------------------時刻を読み込み、時計を表示------------------------------------------
+		pos 945,555
+		color 255,255,255
+		ji=gettime (4):fun=gettime (5):byou=gettime(6)
+		if ji<10:ji="0"+ji+""
+		if fun<10:fun="0"+fun+""
+		if byou<10:byou="0"+byou+""
+		mes ""+ji+":"+fun+":"+byou+""
+		;-----------------------------------------------------------------------------------------------------
+		wait 50
+	loop
+	
+//////////////////////////////////////////////////
+	
+*passin
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*passin)"
+	if passw="password:no":goto*opendesk//パスワードが空白の場合、デスクトップへ移動
+	color 0,100,255:boxf
+	
+	pos 250,250
+	color 255,255,255:mes"パスワードを入力してください。\nユーザー名："+uname+"";読み込んだunameを表示
+	pos 0,0:mes"ようこそ　"+titlename+" \n(C)Yotiosoft 2014-2015"
+	
+	pos 550,250
+	objsize 260,20
+	pass_word = ""
+	input pass_word;入力ボックスを設置
+	sendmsg objinfo_hwnd(0),204,'*'
+	
+	objimage 125,0,0,0,40,0,20
+	objsize 40,20
+	pos 810,250
+	button"OK",*pass_check
+	
+	repeat
+	;Enterキーを押したら*pass_checkへ
+	getkey passenter,13
+	if passenter = 1:goto*pass_check
+	;-------------------------------
+	pos 100,200:gcopy 69,0,0,100,130
+	wait 10
+	loop
+	stop
+*pass_check
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*pass_check)"
+	if pass_word = passw :goto *opendesk:else :goto *pass_matigai;パスワードがあっていれば*yomikomiへ、間違っていれば*pass_matigaiへ
+*opendesk
+	clrobj
+	closepass=1024
+	gsk=1030
+	repeat
+	redraw 0
+		if closepass<1:break
+		color 0,100,255:boxf
+		gsk=gsk/2
+		closepass=closepass-gsk
+		gmode 0
+		pos closepass,0:gcopy 15, , ,1024,576
+		wait 5
+	redraw 1
+	loop
+	goto*yomikomi
+*pass_matigai
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*pass_matigai)"
+	dialog"パスワードが違います",1,"Error"
+	passenter = 0
+	goto*passin
+*yomikomi
+	onerror*error
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*yomikomi)"
+	;変数を全てリセット
+	icx=0
+	iax=0
+	icontx=0
+	imx=0
+	igx=0
+	icfx=0
+	idfx=0
+	imemox=0
+	
+	ic=0
+	ia=0
+	icont=0
+	im=0
+	ig=0
+	icf=0
+	idf=0
+	imemo=0
+	
+	s_e=0
+	
+	x=35
+	;--------------------
+	#uselib "user32.dll"
+	#func GetWindowLongA2 "GetWindowLongA" int , int 
+	#func SetWindowLongA2 "SetWindowLongA" int , int , int 
+	#func SetLayered "SetLayeredWindowAttributes" int , int , int , int 
+	
+	#func global TrackMouseEvent2 "TrackMouseEvent" sptr
+	#func global WindowFromPoint2 "WindowFromPoint" sptr,sptr
+	#func global SetWindowPos2    "SetWindowPos"    sptr,sptr,sptr,sptr,sptr,sptr,sptr
+	GetWindowLongA2 hwnd , -20 
+	SetWindowLongA2 hwnd , -20 , stat | 0x00080000
+
+	SetLayered hwnd , 0 , hantoumei*255/100 , 2
+	
+	if str(haikei)="gazo"{
+		notesel buf
+		noteload"data/config.dat"
+		noteget gazo,14
+		
+		buffer 112:picload gazo
+		picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	
+		gsel 0,2 :color 0,0,0 :boxf
+		
+		pos 0,0 :gzoom 1024,576,112,0,0,picx,picy,1
+		bmpsave "desktop/bufferpicture.bmp";壁紙をbmpで保存
+		buffer 114
+		picload"desktop/bufferpicture.bmp";保存した画像を読み込んでバッファ
+		gsel
+		goto*d1
+	}else{
+		pos 0,0:gcopy 15,0,0,1024,576
+	}
+	;--------------------------------時刻を読み込み---------------------------------
+	ji=gettime (4):fun=gettime (5)
+	if ji<10:ji="0"+ji+""
+	if fun<10:fun="0"+fun+""
+	;--------------------------------------------------------------------------------
+	goto*d1
+
+*desktop
+	redraw 0
+	clrobj:boxf
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*desktop)"
+	fromdesktop=1
+	
+*desktop_notmmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*desktop_notmmstop)"
+	pos 0,0
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	if fromdesktop=1:fromdesktop=0:redraw 1
+	goto*d2
+	
+*d1
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*d1)"
+	mmload"music/kidou.mp3":mmplay
+	
+*d2
+	clrobj
+	if new=1:new=0:goto*weather_tiiki //初期設定後の場合は*weather_tiikiへ
+	
+	onclick gosub *sm_click
+	
+	redraw 2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*d2)" :else: title titlename
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	
+	notopenw=1
+	now="desktop"
+	
+	objsize 30,30
+	font"",12
+	
+	color 255,255,255
+	gmode 2
+	put_icon //アイコンの位置を読み込み
+	if sc_mycon=1 & sub=0{
+		pos sc_myconx2,sc_mycony2:gcopy 4,0,0,30,30
+		pos sc_myconx2,sc_mycony2+30:mes"マイコン\nピュータ"
+	}
+	if sc_app=1 & sub=0{
+		pos sc_appx2,sc_appy2:gcopy 2,0,0,30,30
+		pos sc_appx2,sc_appy2+30:mes"アプリ"
+	}
+	if sc_cp=1 & sub=0{
+		pos sc_cpx2,sc_cpy2:gcopy 106,0,0,30,30
+		pos sc_cpx2,sc_cpy2+30:mes"コントロール\nパネル"
+	}
+	if sc_game=1 & sub=0{
+		pos sc_gamex2,sc_gamey2:gcopy 2,0,0,30,30
+		pos sc_gamex2,sc_gamey2+30:mes"ゲーム"
+	}
+	if sc_krone=1 & sub=0{
+		pos sc_kronex2,sc_kroney2:gcopy 136,0,0,30,30
+		pos sc_kronex2,sc_kroney2+30:mes"Krone"
+	}
+	if sc_mp=1 & sub=0{
+		pos sc_mpx2,sc_mpy2:gcopy 16,0,0,30,30
+		pos sc_mpx2,sc_mpy2+30:mes"Music\nPlayer"
+	}
+	if sc_dentaku=1 & sub=0{
+		pos sc_dentakux2,sc_dentakuy2:gcopy 140,0,0,30,30
+		pos sc_dentakux2,sc_dentakuy2+30:mes"電卓"
+	}
+	if sc_tetris=1 & sub=0{
+		pos sc_tetrisx2,sc_tetrisy2:gcopy 137,0,0,30,30
+		pos sc_tetrisx2,sc_tetrisy2+30:mes"テトリス"
+	}
+	if sc_twitter=1 & sub=0{
+		pos sc_twitterx2,sc_twittery2:gcopy 138,0,0,30,30
+		pos sc_twitterx2,sc_twittery2+30:mes"Twitter"
+	}
+	if sc_facebook=1 & sub=0{
+		pos sc_facebookx2,sc_facebooky2:gcopy 139,0,0,30,30
+		pos sc_facebookx2,sc_facebooky2+30:mes"Facebook"
+	}
+	if w_bclock=1{
+		color 255,255,255
+		if clockfont="c":font "超極細ゴシック",120 :else: font "M+ 1c thin",120
+		pos w_bclockx2,w_bclocky2:mes ""+ji+":"+fun+"
+	
+		if clockfont="c":font "超極細ゴシック",20 :else: font "M+ 1c thin",20
+		youbi=gettime(2)
+		if youbi=0:youbi="Sun"
+		if youbi=1:youbi="Mon"
+		if youbi=2:youbi="Tue"
+		if youbi=3:youbi="Wed"
+		if youbi=4:youbi="Thu"
+		if youbi=5:youbi="Fri"
+		if youbi=6:youbi="Sat"
+	
+		if clockfont="c":mes"　　        　"+gettime(0)+"/"+gettime(1)+"/"+gettime(3)+"  "+youbi+""
+		if clockfont="t":mes"　　    　"+gettime(0)+"/"+gettime(1)+"/"+gettime(3)+"  "+youbi+""
+	}
+	if w_sclock=1{
+		color:gmode 3,,,128
+		boxfa w_sclockx2,w_sclocky2,w_sclockx2+210,w_sclocky2+60
+		if clockfont="c":font "超極細ゴシック",18 :else: font "M+ 1c thin",18
+		color 255,255,255
+		pos w_sclockx2+10,w_sclocky2+5:mes ""+gettime(0)+"/"+gettime(1)+"/"+gettime(3)+" "+youbi+"
+		color 0,128,255:mes ""+ji+":"+fun+"
+	}
+	font"",18
+	if w_search=1 & sub=0{
+		color 255,255,255:gmode 3,,,128
+		boxfa w_searchx2,w_searchy2,w_searchx2+350,w_searchy2+40
+		
+		objsize 255,20
+		keyword="検索キーワードを入力"
+		pos w_searchx2+10,w_searchy2+10:input keyword;検索窓設置
+		objsize 80,15
+		objimage 25, 0,0, 0,827, 0,455
+		pos w_searchx2+265,w_searchy2+5:button"Google",*googlekeyword;Google検索
+		pos w_searchx2+265,w_searchy2+20:button"Yahoo",*yahookeyword;Yahoo検索
+	}
+	if w_weather=1 & notget=0{
+		gosub*weather
+	}
+	
+	color 255,255,255
+	;apu
+	pos 545,546:gcopy 107,0,0,30,30
+	objimage 25, 0,0, 0,827, 0,455
+	apus="ここに命令を入力"
+	objsize 250,20
+	pos 585,550:input apus
+	objsize 50,20
+	pos 850,550:button"OK",*chk_desk
+	
+	if ic>0:pos icx,546:gmode 2:gcopy 4,0,0,30,30;もしもicが1以上になっていたらicx(位置の変数),546に「マイコンピュータ」ボタンを表示する
+	if ia>0:pos iax,546:gmode 2:gcopy 2,0,0,30,30
+	if icont>0:pos icontx,546:gmode 2:gcopy 106,0,0,30,30
+	if im>0:pos imx,546:gmode 2:gcopy 16,0,0,30,30
+	if ig>0:pos igx,546:gmode 2:gcopy 2,0,0,30,30
+	if igu>0:pos igux,546:gmode 2:gcopy 58,0,0,30,30
+	if imemo>0:pos imemox,546:gmode 2:gcopy 113,0,0,30,30
+	
+	pos 1014,546
+	objimage 25, 0,0, 0,827, 0,455:objsize 10,30
+	button"",*jiho
+	
+	if sub=1:sub=0:return
+	font"",18
+	
+	//お知らせの表示
+	if iod=1{
+		rssloads=str(hyoji) ;文字列型になおす
+		rssx=1024
+		saver=0
+		gatsu=gettime(1)
+		nichi=gettime(3)
+		youbi0=gettime(2)
+		;取得した曜日関数を漢字に変換
+		if youbi0=0:youbi="日"
+		if youbi0=1:youbi="月"
+		if youbi0=2:youbi="火"
+		if youbi0=3:youbi="水"
+		if youbi0=4:youbi="木"
+		if youbi0=5:youbi="金"
+		if youbi0=6:youbi="土"
+		;----------------------------
+		
+		notesel hyoji
+		noteload"data/info.txt"
+		
+*y_info
+		saver=saver+1
+		if saver=6000:goto*screensaver
+		if rssx<-1200:rssx=1024
+		clock_new=clock_new+1
+		color 128,128,128:boxf 0,0,1024,20
+		rssx=rssx-1
+		rji=gettime(4)
+		if 0 <= rji & 12 >=rji:talk="おはようございます。"
+		if 11 <= rji & 17 >=rji:talk="こんにちは。"
+		if 18 <= rji & 24 >=rji:talk="こんばんは。"
+		pos rssx,1:color 255,255,255
+		mes ""+talk+"今日は"+gatsu+"月"+nichi+"日 "+youbi+"曜日です。"+hyoji+"
+	
+		if clock_new=10{
+			clock_new=0
+			pos 945,550
+			gcopy 15,945,550,1024,576
+			;--------------------------------時刻を読み込み、時計を表示------------------------------------------
+			pos 945,555
+			color 255,255,255
+			ji=gettime (4):fun=gettime (5):byou=gettime(6)
+			if ji<10:ji="0"+ji+""
+			if fun<10:fun="0"+fun+""
+			if byou<10:byou="0"+byou+""
+			mes ""+ji+":"+fun+":"+byou+""
+			;-----------------------------------------------------------------------------------------------------
+		}
+		wait 2
+		redraw 1
+		goto*y_info
+	}else{
+		clock
+	}
+	stop
+
+*screensaver
+	clrobj
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*screensaver)"
+	onclick*desktop
+
+	#module
+	#deffunc fadein int id, int px, int py, int sx, int sy, int times, int sp
+	if times > 0 {
+		repeat times
+			redraw 0
+			gmode 3, sx, sy, 256 * cnt / times
+			boxf ginfo_cx, ginfo_cy, ginfo_cx + sx, ginfo_cy + sy
+			gcopy id, px, py
+			redraw 1
+			wait sp
+		loop
+	}
+	gmode 1, sx, sy
+	gcopy id, px, py
+	return
+	#global
+
+	wx = ginfo_winx : wy = ginfo_winy
+	gsel 0
+	color 255,255,255
+	pos 0,0 : fadein 72, , , wx, wy, 50, 1
+	
+	stop
+*stoping
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*stoping)"
+	stop
+
+*menu
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu)"
+	mmstop
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	#include "startmenu.hsp"
+	#include "tskbutton.hsp"
+	clock
+	stop
+	
+;-------------------------マイコン、アプリケーション、ゲームなどのフォルダ各種-----------------------------------
+*mycon
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*mycon)"
+	ifc=0
+	ifd=0
+	ifm=1
+	objimage 25, 0,0, 0,827, 0,455
+	ic=ic+1;icに１を足す
+	if ic=1:icx=30+x:x=x+30;もしもic=1ならicx（ボタンの位置の変数）は30+xにする
+	#include "window.hsp"
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"マイコンピュータ"
+	oldnow=now
+	now="mycon"
+	
+	close=*xmycon
+	buttons
+	
+	if sub=0{
+		pos 50,80
+		objsize 110,30
+		objimage 176,0,0,827,456
+		button"マイコンピュータ",*mycon
+		
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		button"アプリケーション",*app
+		button"ゲーム",*game
+		button"リムーバブルディスク",*SD
+		button"Krone",*net
+	}
+	
+	color 0,162,232:line 160,53,998,53:line 160,53,160,506:line 999,53,999,506:line 160,506,998,506
+	
+	objimage 13
+	color 0,0,0
+	objsize 100,30
+	pos 450,80
+	button "",*c
+	mes"コンピュータ(C:)"
+	pos 450,130
+	button "",*d
+	mes"ローカルディスク(D:)"
+	objimage 14
+	pos 450,180
+	button "",*sd
+	mes"リムーバブルディスク(F:)"
+	if sub=1:sub=0:return//subが1の場合は0に戻し、return
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_mc
+	if oldnow="":stop
+	objimage 25, 0,0, 0,827, 0,455:pos 175,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*xmycon
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xmycon)"
+	ifc=0
+	ifd=0
+	ifm=0
+	ic=0;icを０にし、タスクバーにボタンを表示させなくする
+	xm=xm+1;xm（ウィンドウを閉じた回数）にxmを足す
+	x=x-30;xから30を引く（ウィンドウの位置がおかしくなることを防ぐため）
+	if icx<iax:iax=iax-30;もしもiax(アプリケーションボタンの位置）がicxより右の位置にあれば、iaxを１００引く（つまりアプリケーションボタンが１つ左にずれる）
+	if icx<icx:icx=icx-30
+	if icx<icontx:icontx=icontx-30
+	if icx<imx:imx=imx-30
+	if icx<igx:igx=igx-30
+	if icx<icfx:icfx=icfx-30
+	if icx<idfx:idfx=idfx-30
+	if icx<igux:igux=igux-30
+	if icx<imemox:imemox=imemox-30
+	icx=0;icxをリセット
+	goto*desktop
+	stop
+*menu_mc
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_sc)"
+	if sm="small":sub=1:gosub*mycon//スタートメニューが小サイズの場合、サブルーチンをONにして*myconへジャンプ
+	#include "startmenu.hsp"
+	clock
+	stop
+	
+*SD
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*SD)"
+	dialog"SDカードには対応していません",1,"Error"
+	stop
+	
+*c
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*c)"
+	ifm=0
+	ifd=0
+	ifc=1
+	ic=ic+1;icに１を足す
+	if ic=1:icx=30+x:x=x+30;もしもic=1ならicx（ボタンの位置の変数）は30+xにする
+	#include "window.hsp"
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"コンピュータ（C:）"
+	close=*xmycon
+	buttons
+	objimage 25, 0,0, 0,827, 0,455
+	pos 40,80
+	pos 25,55
+	
+	oldnow=now
+	now="c"
+	
+	if sub=0{
+		pos 50,80
+		objsize 110,30
+		objimage 176,0,0,827,456
+		button"マイコンピュータ",*mycon
+		
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		button"アプリケーション",*app
+		button"ゲーム",*game
+		button"リムーバブルディスク",*SD
+		button"Krone",*net
+	}
+	
+	color 0,162,232:line 160,53,998,53:line 160,53,160,506:line 999,53,999,506:line 160,506,998,506
+	
+	objimage 8
+	color 0,0,0
+	objsize 100,30
+	pos 250,60
+	button "",*app
+	mes"アプリケーション"
+	pos 400,60
+	button "",*game
+	mes"　 ゲーム"
+	objimage 11
+	pos 550,60
+	button "",*net
+	mes"Krone.exe"
+	objimage 9
+	pos 700,60
+	button "",*memo
+	mes"メモ帳.exe"
+	
+	if sub=1:sub=0:return
+	if oldnow="":stop
+	objimage 25, 0,0, 0,827, 0,455:pos 175,55:objsize 30,30:button"←",*returns
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_c
+	clock
+	stop
+*menu_c
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_c)"
+	if sm="small":sub=1:gosub*c
+	#include "startmenu.hsp"
+	clock
+	stop
+	
+*d
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*d)"
+	screen 0,1024,576
+	ifm=0
+	ifc=0
+	ifd=1
+	ic=ic+1;icに１を足す
+	if ic=1:icx=30+x:x=x+30;もしもic=1ならicx（ボタンの位置の変数）は30+xにする
+	screen 0,1024,576
+	#include "window.hsp"
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"ローカルディスク（D:）"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xmycon
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop_notmmstop
+	
+	oldnow=now
+	now="d"
+	
+	if sub=0{
+		pos 50,80
+		objsize 110,30
+		objimage 176,0,0,827,456
+		button"マイコンピュータ",*mycon
+		
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		button"アプリケーション",*app
+		button"ゲーム",*game
+		button"リムーバブルディスク",*SD
+		button"Krone",*net
+	
+		objimage 5
+		objsize 100,30
+		color 0,0,0
+		pos 200,60
+		button "",*n1
+		mes"謎の画像①.jpg"
+		
+		pos 200,110
+		button "",*n6
+		mes"謎の画像⑥.jpg"
+	
+		objimage 6
+		pos 200,160
+		button"",*n11
+		mes"謎の音楽①.mp3"
+		
+		pos 200,210
+		button"",*n16
+		mes"謎の音楽⑥.wav"
+	}
+
+	color 0,162,232:line 160,53,998,53:line 160,53,160,506:line 999,53,999,506:line 160,506,998,506
+	
+	objimage 5
+	objsize 100,30
+	color 0,0,0
+	
+	pos 350,60
+	button "",*n2
+	mes"謎の画像②.jpg"
+	pos 500,60
+	button "",*n3
+	mes"謎の画像③.jpg"
+	pos 650,60
+	button "",*n4
+	mes"謎の画像④.jpg"
+	pos 800,60
+	button "",*n5
+	mes"謎の画像⑤.jpg"
+
+	pos 350,110
+	button "",*n7
+	mes"謎の画像⑦.jpg"
+	pos 500,110
+	button "",*n8
+	mes"謎の画像⑧.jpg"
+	pos 650,110
+	button "",*n9
+	mes"謎の画像⑨.jpg"
+	pos 800,110
+	button "",*n10
+	mes"謎の画像⑩.jpg"
+	
+	objimage 6
+	pos 200,160
+	pos 350,160
+	button"",*n12
+	mes"謎の音楽②.mp3"
+	pos 500,160
+	button"",*n13
+	mes"謎の音楽③.mp3"
+	pos 650,160
+	button"",*n14
+	mes"謎の音楽④.mid"
+	pos 800,160
+	button"",*n15
+	mes"謎の音楽⑤.mp3"
+
+	pos 350,210
+	button"",*n17
+	mes"謎の音楽⑦.mp3"
+	pos 500,210
+	button"",*n18
+	mes"謎の音楽⑧.wav"
+	pos 650,210
+	button"",*n19
+	mes"謎の音楽⑨.mp3"
+	pos 800,210
+	button"",*n20
+	mes"謎の音楽⑩.mp3"
+	
+	if sub=1:sub=0:return
+	if oldnow="":stop
+	objimage 25, 0,0, 0,827, 0,455:pos 175,55:objsize 30,30:button"←",*returns
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_d
+	clock
+	stop
+*menu_d
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_d)"
+	if sm="small":sub=1:gosub*d
+	#include "startmenu.hsp"
+	clock
+	stop
+	
+;-----------------------------------------------なぞの画像・音楽読み込みゾーン-------------------------------------------------------
+*n1
+	picload"img/kumapoo.jpg"
+	button"戻る",*d
+	stop
+*n2
+	picload"img/n2.jpg"
+	button"戻る",*d
+	stop
+*n3
+	picload"img/n3.jpg"
+	button"戻る",*d
+	stop
+*n4
+	picload"img/n4.jpg"
+	button"戻る",*d
+	stop
+*n5
+	picload"img/n5.jpeg"
+	button"戻る",*d
+	stop
+*n6
+	picload"img/n6.jpg"
+	button"戻る",*d
+	stop
+*n7
+	picload"img/n7.jpg"
+	button"戻る",*d
+	stop
+*n8
+	picload"img/n8.jpg"
+	button"戻る",*d
+	stop
+*n9
+	picload"img/n9.jpg"
+	button"戻る",*d
+	stop
+*n10
+	picload"img/n10.jpg"
+	button"戻る",*d
+	stop
+*n11
+	mmload"music/nazo1.mp3":mmplay
+	stop
+*n12
+	mmload"music/nazo2.mp3":mmplay
+	stop
+*n13
+	mmload"music/nazo3.mp3":mmplay
+	stop
+*n14
+	mmload"app/tetris/bgm.mid":mmplay
+	stop
+*n15
+	mmload"music/nazo5.mp3":mmplay
+	stop
+*n16
+	mmload"music/nazo6.wav":mmplay
+	stop
+*n17
+	mmload"music/nazo7.mp3":mmplay
+	stop
+*n18
+	mmload"music/nazo8.wav":mmplay
+	stop
+*n19
+	mmload"music/kidou.mp3":mmplay
+	stop
+*n20
+	mmload"music/shuryo.mp3":mmplay
+	stop
+;-----------------------------------------------------------------------------------------------
+
+*app
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*app)"
+	sidevar=1
+	ia=ia+1
+	if ia=1:iax=30+x:x=x+30
+	#include "window.hsp"
+	objimage 25, 0,0, 0,827, 0,455
+	
+	pos 30,20
+	gmode 2:gcopy 2,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"アプリケーション"
+	oldnow=now
+	now="app"
+	
+	close=*xapp
+	buttons
+	
+	if sub=0{
+		pos 50,80
+		objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+		button"マイコンピュータ",*mycon
+		objimage 176,0,0,827,456:objsize 110,30
+		button"アプリケーション",*app
+		objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+		button"ゲーム",*game
+		button"リムーバブルディスク",*SD
+		button"Krone",*net
+	}
+	
+	color 0,162,232:line 160,53,998,53:line 160,53,160,506:line 999,53,999,506:line 160,506,998,506
+
+	objsize 100,30
+	color 0,0,0
+	objimage 11
+	pos 350,80
+	button "",*net
+	mes"Krone.exe"
+	objimage 8
+	pos 500,80
+	button "",*game
+	mes"ゲーム"
+	objimage 9
+	pos 650,80
+	button "",*memo
+	mes"メモ帳.exe"
+	objimage 6
+	pos 350,130
+	button "",*MP
+	mes"Music Player.exe"
+	objimage 10
+	pos 500,130
+	button "",*dentaku
+	mes"電卓.exe"
+	objimage 12
+	pos 650,130
+	button "",*ramen
+	mes"ラーメンタイマー.exe"
+	objimage 22
+	pos 350,180
+	button "",*Twitter
+	mes" Twitter.exe"
+	objimage 23
+	pos 500,180
+	button "",*FB
+	mes"Facebook.exe"
+	objimage 24
+	pos 650,180
+	button "",*paint
+	mes"Paint.exe"
+	objimage 10
+	pos 350,230
+	button "",*dentakuz
+	mes"消費税計算機Z.exe"
+	if sub=1:sub=0:return
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_app
+	if oldnow="":stop
+	objimage 25, 0,0, 0,827, 0,455:pos 175,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*xapp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xapp)"
+	ia=0
+	xa=xa+1
+	xa2=0
+	x=x-30
+	if iax<iax:iax=iax-30
+	if iax<icx:icx=icx-30
+	if iax<icontx:icontx=icontx-30
+	if iax<imx:imx=imx-30
+	if iax<igx:igx=igx-30
+	if iax<icfx:icfx=icfx-30
+	if iax<idfx:idfx=idfx-30
+	if iax<igux:igux=igux-30
+	if iax<imemox:imemox=imemox-30
+	iax=0
+	goto*desktop
+	stop
+*menu_app
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_app)"
+	if sm="small":sub=1:gosub*app
+	#include "startmenu.hsp"
+	clock
+	stop
+
+*game
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*game)"
+	cls
+	title titlename
+	mmstop
+	ig=ig+1
+	if ig=1:igx=30+x:x=x+30
+	#include "window.hsp"
+	objimage 25, 0,0, 0,827, 0,455
+	
+	pos 30,20
+	gmode 2:gcopy 2,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"ゲーム"
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	close=*xgame
+	buttons
+	
+	oldnow=now
+	now="game"
+	
+	if sub=0{
+		pos 50,80
+		objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+		button"マイコンピュータ",*mycon
+		button"アプリケーション",*app
+		objimage 176,0,0,827,456:objsize 110,30
+		button"ゲーム",*game
+		objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+		button"リムーバブルディスク",*SD
+		button"Krone",*net
+	}
+	
+	color 0,162,232:line 160,53,998,53:line 160,53,160,506:line 999,53,999,506:line 160,506,998,506
+	
+	color 0,0,0
+	objsize 100,30
+	
+	pos 300,60
+	objimage 7
+	button "",*tetris
+	mes"テトリス.exe"
+	
+	pos 450,60
+	objimage 71
+	button"",*rpg
+	mes"史上最悪なRPG.exe"
+	
+	if sub=1:sub=0:return
+	if oldnow="":stop
+	objimage 25, 0,0, 0,827, 0,455:pos 175,55:objsize 30,30:button"←",*returns
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_game
+	clock
+	stop
+*xgame
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xgame)"
+	ig=0
+	x=x-30
+	xg=xg+1
+	if igx<iax:iax=iax-30
+	if igx<icx:icx=icx-30
+	if igx<icontx:icontx=icontx-30
+	if igx<imx:imx=imx-30
+	if igx<igx:igx=igx-30
+	if igx<icfx:icfx=icfx-30
+	if igx<idfx:idfx=idfx-30
+	if igx<igux:igux=igux-30
+	if igx<imemox:imemox=imemox-30
+	igx=0
+	goto*desktop
+	stop
+*menu_game
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_game)"
+	if sm="small":sub=1:gosub *game
+	#include "startmenu.hsp"
+	clock
+	stop
+
+;------------------------------------コントロールパネル-----------------------------------------
+*CP
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*CP)" :else: title titlename
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include "window.hsp"
+	objimage 25, 0,0, 0,827, 0,455
+	
+	notesel buf
+	noteload "data/config.dat"
+	noteget windowcolor,6
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	oldnow=now
+	now="cp"
+	close=*xcp
+	buttons
+	
+	color 195,195,195
+	line 375,55,375,506
+	line 615,55,615,506
+	
+	objimage 25, 0,0, 0,827, 0,455
+	color 0,0,0
+	objsize 200,30
+	
+	pos 150,60:mes"アカウント設定"
+	if sub=0{
+		button "パスワードの変更",*passhenko
+		button "ユーザー名の変更",*namehenko
+		button "ユーザー画像の変更",*userphoto
+		button "開発者モード",*dev
+	}
+	pos 150,300:gcopy 126,0,0,200,200
+	
+	pos 400,60:mes"デザイン設定"
+	button "ウィンドウの色の変更",*colorchange
+	button "ウィンドウの半透明化",*hantome
+	button "スタートメニューの大きさを変更",*startmenusetting
+	button "デスクトップ背景の変更",*haikeihenko
+	button "時計のフォント設定",*clock_font_setting
+	button "デスクトップでのお知らせの表示",*infomation_on_desktop
+	pos 400,300:gcopy 127,0,0,200,200
+	
+	pos 640,60:mes"その他"
+	button "Kroneスタートページの変更",*ke
+	button "天気ウィジェットの設定",*weather_set
+	button "時報の音を変更",*jihochange
+	button "ショートカット設定",*shortcut
+	button "アップデート",*update
+	button "設定の初期化",*reset
+	pos 640,300:gcopy 128,0,0,200,200
+	
+	if sub=1:sub=0:return
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_cp
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*xcp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xcp)"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	x=x-30
+	icont=0
+	xcont=xcont+1
+	if icontx<iax:iax=iax-30
+	if icontx<icx:icx=icx-30
+	if icontx<icontx:icontx=icontx-30
+	if icontx<imx:imx=imx-30
+	if icontx<igx:igx=igx-30
+	if icontx<icfx:icfx=icfx-30
+	if icontx<idfx:idfx=idfx-30
+	if icontx<igux:igux=igux-30
+	if icontx<imemox:imemox=imemox-30
+	icontx=0
+	goto*desktop
+	stop
+*menu_cp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_cp)"
+	if sm="small":sub=1:gosub*cp
+	#include "startmenu.hsp"
+	clock
+	stop
+*passhenko
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*passhenko)"
+	/////コントロールパネル内の変数/////
+	ifcp=0
+	ifpass=1
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	////////////////////////////////////
+	#include "window.hsp"
+	close=*xcp
+	buttons
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	
+	newpass=""
+	color
+	pos 350,100:mes"変更するパスワードを入力してください。\n（空白にすると、パスワードなしでログインできます）"
+	objsize 200,30
+	pos 400,150:input newpass
+	objimage 25, 0,0, 0,827, 0,455
+	button"OK",*henkogo2
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button"",*menu_cp
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*henkogo2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*henkogo2)"
+	if newpass="":newpass="password:no"
+	notesel newpass
+	notesave "data/pass.txt"
+	dialog"パスワードの変更を承りました"
+	goto*cp
+*ke
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke)"
+	ifcp=0
+	ifpass=0
+	ifke=1
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	#include "window.hsp"
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	close=*xcp
+	buttons
+	
+	newpass=""
+	color
+	pos 280,60:mes"Kroneのスタートページの変更できます。\nスタートページは、Kroneが起動された時に一番最初に表示されます。"
+	objsize 200,30
+	objimage 25, 0,0, 0,827, 0,455
+	pos 400,100
+	button"Living",*ke_l
+	button"Google",*ke_g
+	button"Yahoo",*ke_y
+	button"goo",*ke_goo
+	button"Excite",*ke_e
+	button"Bing",*ke_bi
+	button"Baidu",*ke_ba
+	button"Ask.com",*ke_a
+	button"Joogle",*ke_j
+	mes"又はURLを入力"
+	objsize 170,20
+	seachurl="http://"
+	input seachurl
+	objsize 30,20:pos 570,388:button"OK",*ke_url
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*ke_l
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_l)"
+	configsave
+	search="http://joogle.web.fc2.com/living.html"
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_g
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_g)"
+	search="http://www.google.co.jp"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_y
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_y)"
+	search="http://www.yahoo.co.jp"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_goo
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_goo)"
+	search="http://www.goo.ne.jp/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_e
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_e)"
+	search="http://www.excite.co.jp/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_bi
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_bi)"
+	search="https://www.bing.com/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_ba
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_ba)"
+	search="http://www.baidu.jp/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_a
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_a)"
+	search="http://jp.ask.com/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_j
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*le_j)"
+	search="http://joogle.web.fc2.com/"
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*ke_url
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ke_url)"
+	search=""+seachurl+""
+	configsave
+	notesave "data/config.dat"
+	dialog"スタートページを変更しました。"
+	goto*CP
+	stop
+*namehenko
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*namehenko)"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=1
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include "window.hsp"
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"ユーザー名の変更"
+	close=*xcp
+	buttons
+	newname=""+uname+""
+	color
+	pos 350,100:mes"現在のユーザー名："+uname+"\n変更するユーザー名を入力してください。"
+	objsize 300,20
+	pos 350,150:input newname
+	objimage 25, 0,0, 0,827, 0,455
+	button"OK",*namehenko2
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*namehenko2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*namehenko2)"
+	configsave
+	noteadd newname,8,1
+	notesave "data/config.dat"
+	
+	dialog"ユーザー名を変更しました。"
+	
+	uname=newname
+	
+	goto*CP
+	stop
+*haikeihenko
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*haikeihenko)"
+	#include "haikei.hsp"
+	stop
+*haikeihenko2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*haikeihenko2)"
+	goto*cp;本当はここで再起動しなくても背景が変わるようにしたかったのだが、エラーが発生するためとりあえず*cpへ飛ぶようにしている
+	stop
+*colorchange
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange)"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include "window.hsp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color:pos 330,60:mes"現在のウィンドウ色：\n（ウィンドウの色はスタートメニューにも反映されます）"
+	gmode 0
+	pos 490,60:gcopy 25,0,0,100,20
+	pos 310,100
+	objimage 52
+	objsize 100,30
+	button"黒",*colorchange_1
+	pos 410,100
+	objimage 45
+	objsize 100,30
+	button"青",*colorchange_2
+	pos 510,100
+	objimage 46
+	objsize 100,30
+	button"ピンク",*colorchange_3
+	pos 610,100
+	objimage 47
+	objsize 100,30
+	button"白",*colorchange_4
+	pos 310,130
+	objimage 48
+	objsize 100,30
+	button"赤",*colorchange_5
+	pos 410,130
+	objimage 49
+	objsize 100,30
+	button"緑",*colorchange_6
+	pos 510,130
+	objimage 50
+	objsize 100,30
+	button"黄色",*colorchange_7
+	pos 610,130
+	objimage 51
+	objsize 100,30
+	button"オレンジ",*colorchange_8
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"ウィンドウの色の変更"
+	close=*xcp
+	buttons
+	objimage 25, 0,0, 0,827, 0,455
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*colorchange_1
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_1)"
+	newcolor=str("black")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=0:g=0:b=0
+		goto*cp
+*colorchange_2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_2)"
+	newcolor=str("blue")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=0:g=162:b=232
+		goto*cp
+*colorchange_3
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_3)"
+	newcolor=str("pink")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=255:g=174:b=201
+		goto*cp
+*colorchange_4
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_4)"
+	newcolor=str("white")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=255:g=255:b=255
+		goto*cp
+*colorchange_5
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_5)"
+	newcolor=str("red")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=237:g=28:b=36
+		goto*cp
+*colorchange_6
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_6)"
+	newcolor=str("green")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=181:g=230:b=29
+		goto*cp
+*colorchange_7
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_7)"
+	newcolor=str("yellow")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=255:g=242:b=0
+		goto*cp
+*colorchange_8
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*colorchange_8)"
+	newcolor=str("orange")
+		configsave
+		noteadd newcolor,6,1
+		notesave "data/config.dat"
+		dialog"ウィンドウの色を変更しました"
+		r=255:g=201:b=14
+		goto*cp
+*hantome
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*hantome)"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=1
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	#include "window.hsp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 330,60:mes"現在のウィンドウの濃さ："+hantoumei+"
+	pos 400,100:objimage 25, 0,0, 0,827, 0,455:objsize 100,20:newhantomei="":input newhantoumei:pos 500,100:button"OK",*hantome2
+	pos 400,120:mes"*0～100の間に設定してください。\n（0=透明ウィンドウ　100=普通のウィンドウ)"
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"ウィンドウの半透明化"
+	close=*xcp
+	buttons
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*hantome2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*hantome2)"
+	if newhantoumei>100:dialog"0～100の間に設定してください":goto*hantome
+	if newhantoumei<0:dialog"0～100の間に設定してください":goto*hantome
+	new=str(newhantoumei)
+	
+	configsave
+	noteadd new,12,1
+	notesave "data/config.dat"
+	hantoumei=int(new)
+	
+	dialog"ウィンドウの透明度を変更しました。"
+	hantoumei=newhantoumei
+	hantoumei=int(hantoumei)
+	#uselib "user32.dll" 
+
+	GetWindowLongA2 hwnd , -20 
+	SetWindowLongA2 hwnd , -20 , stat | 0x00080000
+
+	SetLayered hwnd , 0 , hantoumei*255/100 , 2
+	goto*cp
+*userphoto
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*userphoto)"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=1
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	#include "window.hsp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color:pos 300,80:mes"下から選んでください。"
+	pos 350,100:objimage 60:objsize 100,130:button"",*up1
+	pos 450,100:objimage 61:objsize 100,130:button"",*up2
+	pos 550,100:objimage 62:objsize 100,130:button"",*up3
+	pos 350,230:objimage 63:objsize 100,130:button"",*up4
+	pos 450,230:objimage 64:objsize 100,130:button"",*up5
+	pos 550,230:objimage 65:objsize 100,130:button"",*up6
+	pos 350,360:objimage 66:objsize 100,130:button"",*up7
+	pos 450,360:objimage 67:objsize 100,130:button"",*up8
+	pos 550,360:objimage 68:objsize 100,130:button"",*up9
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"ユーザー画像の変更"
+	close=*xcp
+	buttons
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*up1
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up1)"
+	newup=1
+	goto*uphenko
+*up2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up2)"
+	newup=2
+	goto*uphenko
+*up3
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up3)"
+	newup=3
+	goto*uphenko
+*up4
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up4)"
+	newup=4
+	goto*uphenko
+*up5
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up5)"
+	newup=5
+	goto*uphenko
+*up6
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up6)"
+	newup=6
+	goto*uphenko
+*up7
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up7)"
+	newup=7
+	goto*uphenko
+*up8
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up8)"
+	newup=8
+	goto*uphenko
+*up9
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*up9)"
+	newup=9
+	goto*uphenko
+*uphenko
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*uphenko)"
+	newup=str(newup)
+	configsave
+	noteadd newup,2,1
+	notesave"data/config.dat"
+	goto*cp
+*reset
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*reset)"
+	dialog"ユーザー設定をすべて初期状態に戻します。\n初期化された設定は元には戻りません。\nよろしいですか？",3,"警告"
+	if stat=6:goto*reset2
+	if stat=7:stop
+	stop
+*reset2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*reset2)"
+	;デフォルトの状態に設定を変更
+	shokiinstall=str("yet")
+		notesel shokiinstall 
+		notesave "data/install.txt"
+	restart=1
+	
+	notesel vns
+	noteload"data/vn.txt"
+	noteget vn,1
+		
+	dialog"初期状態になりました。\n再起動します。",,"初期化完了"
+	exec vn
+	end
+*startmenusetting
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*startmenusetting)"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include "window.hsp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 400,100
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 200,30
+	button"大",*smbig
+	button"小",*smsmall
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"スタートメニューの大きさを変更"
+	close=*xcp
+	buttons
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*smbig
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*smbig)"
+	newsmstyle=str("big")
+		configsave
+		noteadd newsmstyle,18,1
+		notesave "data/config.dat"
+	dialog"スタートメニューの大きさを「大」に変更しました。"
+	goto*cp
+*smsmall
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*smsmall)"
+	newsmstyle=str("small")
+		configsave
+		noteadd newsmstyle,18,1
+		notesave "data/config.dat"
+	dialog"スタートメニューの大きさを「小」に変更しました。"
+	goto*cp
+*jihochange
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*jihochange)"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	#include "window.hsp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 400,100
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 200,30
+	button"時計の音",*jiho1
+	button"時報音",*jiho2
+	button"おなら",*jiho3
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"時報の音を変更"
+	close=*xcp
+	buttons
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*jiho1
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*jiho1)"
+	newjiho=str("clock")
+		configsave
+		noteadd newjiho,20,1
+		notesave "data/config.dat"
+	dialog"時報の音を変更しました"
+	goto*cp
+*jiho2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*jiho2)"
+	newjiho=str("jiho_on")
+		configsave
+		noteadd newjiho,20,1
+		notesave "data/config.dat"
+	dialog"時報の音を変更しました"
+	goto*cp
+*jiho3
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*jiho3)"
+	newjiho=str("poo")
+		configsave
+		noteadd newjiho,20,1
+		notesave "data/config.dat"
+	dialog"時報の音を変更しました"
+	goto*cp
+
+*gazos ;自分の画像を背景に設定するときに使用
+	gen=dirinfo(1)
+	dialog "jpg;*.jpeg;*.png;*.bmp",16,"画像ファイル"
+	
+	if stat=0{
+		chdir gen//カレントフォルダを元に戻す
+		stop
+	}else{
+		notesel buf
+			configsave
+			noteadd "gazo",4,1
+			noteadd refstr,14,1
+		chdir gen//カレントフォルダを元に戻す
+		notesave "data/config.dat"
+		
+		dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+		stop
+	}
+	
+*clock_font_setting
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*clock_font_setting)"
+	#include"window.hsp"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	oldnow="cp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"時計のフォント設定"
+	close=*xcp
+	buttons
+	
+	pos 60,60:color 195,195,195:font "",30:mes"時計のフォント設定"
+	line 25,100,900,100
+	color:font "",18
+	
+	objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+	pos 456,120
+	button"超極細ゴシック",*font_c
+	button"M+ 1c thin",*font_t
+	
+	pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*font_c
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*font_c)"
+	clockfont="c"
+	configsave
+	notesave"data/config.dat"
+	clock
+*font_t
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*font_t)"
+	clockfont="t"
+	configsave
+	notesave"data/config.dat"
+	clock
+	
+*update
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*update)"
+	#include"window.hsp"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=1
+	ifshortcut=0
+	ifdev=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	
+	oldnow="cp"
+	pos 25,55:objsize 30,30:button"←",*returns
+	close=*xcp
+	buttons
+	objimage 58:pos 914,20:objsize 30,30:button"",*guide1
+	
+	color
+	pos 55,80:mes"更新の確認中・・・"
+	pos 337,180
+	gcopy 123,0,0,350,124
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"アップデート"
+	close=*xcp
+	
+	//更新確認
+	alloc buf,1024*1024
+
+	netinit										;	プラグインの初期化
+
+	neturl "http://joogle.web.fc2.com/datacenter/walls/"			;	ＵＲＬの指定
+
+	netdlname "data/newversion.txt"						;	ダウンロード後のファイル名
+	netrequest "newversion.txt"						;	ファイル名の指定（ここで指定する）
+
+	repeat
+		exist "data/newversion.txt"
+		netexec res
+		if res : break
+		await 50
+	loop
+
+	netterm										;	プラグインの開放
+	
+	notesel nvn
+	noteload"data/newversion.txt"
+	
+	notesel vns
+	noteload"data/vn.txt"
+	noteget vn,0
+	
+	if int(vn)<nvn{
+		dialog "更新があります！\n更新しますか？",2,"確認"
+		if stat=6:delete "data/newversion.txt":goto*update2
+		if stat=7:delete "data/newversion.txt":goto*cp
+	}else{
+		dialog"お使いのWallsは最新版です"
+		delete "data/newversion.txt"
+		clock
+		stop
+	}
+	stop
+*update2
+	color 255,255,255:boxf 45,70,300,100
+	color:pos 55,80:mes"ダウンロード中..."
+	//アップデーターのダウンロードURLを取得
+	alloc buf,1024*1024
+
+	netinit										;	プラグインの初期化
+
+	neturl "http://joogle.web.fc2.com/datacenter/walls/"			;	ＵＲＬの指定
+
+	netdlname "data/updater_url.txt"						;	ダウンロード後のファイル名
+	netrequest "updater_url.txt"						;	ファイル名の指定（ここで指定する）
+
+	repeat
+		exist "data/updater_url.txt"
+		netexec res
+		if res : break
+		await 50
+	loop
+
+	netterm										;	プラグインの開放
+	
+	notesel updater_url
+	noteload"data/updater_url.txt"
+	
+	
+	//アップデーターをダウンロード
+	alloc buf,1024*1024
+
+	netinit										;	プラグインの初期化
+
+	neturl updater_url			;	ＵＲＬの指定
+
+	netdlname "walls update.exe"					;	ダウンロード後のファイル名
+	netrequest "walls update.exe"						;	ファイル名の指定（ここで指定する）
+
+	repeat
+		exist "walls update.exe"
+		netexec res
+		if res : break
+		await 50
+	loop
+
+	netterm										;	プラグインの開放
+	delete "data/updater_url.txt"
+	exec "walls update.exe",16
+	end
+	
+*downgrade
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*update)"
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include"window.hsp"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	
+	oldnow="cp"
+	objimage 25, 0,0, 0,827, 0,455
+	pos 25,55:objsize 30,30:button"←",*returns
+	close=*xcp
+	buttons
+	
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"ダウングレード"
+	close=*xcp
+	
+	pos 60,60:color 195,195,195:font "",30:mes"ダウングレード"
+	line 25,100,900,100
+	color:font "",18
+	
+	pos 400,150:mes"戻したいバージョンを選んでください"
+	pos 412,180:objimage 25, 0,0, 0,827, 0,455:objsize 200,30
+	button"Walls Waterloo SP1",*down_waterloosp1
+	
+	clock
+	stop
+*down_waterloosp1
+	//アップデーターをダウンロード
+	alloc buf,1024*1024
+
+	netinit										;	プラグインの初期化
+
+	neturl "https://docs.google.com/uc?authuser=0&id=0B2KQVv12cOTcd2M2cDNZeXpiVHc&export=download"			;	ＵＲＬの指定
+
+	netdlname "walls update.exe"					;	ダウンロード後のファイル名
+	netrequest "walls update.exe"						;	ファイル名の指定（ここで指定する）
+
+	repeat
+		exist "walls update.exe"
+		netexec res
+		if res : break
+		await 50
+	loop
+
+	netterm										;	プラグインの開放
+	
+	exec "walls update.exe",16
+	end
+
+*shortcut
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*shortcut)"
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include"window.hsp"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=1
+	ifdev=0
+	
+	oldnow="cp"
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"ショートカット設定"
+	close=*xcp
+	buttons
+	objimage 58:pos 914,20:objsize 30,30:button"",*guide2
+	
+	pos 60,60:color 195,195,195:font "",30:mes"ショートカット設定"
+	line 25,100,900,100
+	color:font "",18
+	
+	pos 60,110:mes"デスクトップに表示させたい項目にチェックを付け、位置を指定してください。（数字以外の文字を入力しないでください！）\n＊1マス＝横：30px*70px、縦：30px*60px"
+	
+	oncmd gosub *createcheckbox, WM_CTLCOLORSTATIC		;	スタティックコントロールが作成されるときに割り込み
+	//チェックボックス類
+	//1行目
+	pos 100,150:objsize 150,20:chkbox "マイコンピュータ",sc_mycon
+		objsize 50,20
+		pos 100,170:mes"横"
+		pos 120,170:input sc_myconx:pos 175,170:mes"マス 縦"
+		pos 240,170:input sc_mycony:pos 295,170:mes"マス"
+		
+	pos 100,200:objsize 150,20:chkbox "アプリケーション",sc_app
+		objsize 50,20
+		pos 100,220:mes"横"
+		pos 120,220:input sc_appx:pos 175,220:mes"マス 縦"
+		pos 240,220:input sc_appy:pos 295,220:mes"マス"
+		
+	pos 100,250:objsize 150,20:chkbox "コントロールパネル",sc_cp
+		objsize 50,20
+		pos 100,270:mes"横"
+		pos 120,270:input sc_cpx:pos 175,270:mes"マス 縦"
+		pos 240,270:input sc_cpy:pos 295,270:mes"マス"
+		
+	pos 100,300:objsize 150,20:chkbox "ゲーム",sc_game
+		objsize 50,20
+		pos 100,320:mes"横"
+		pos 120,320:input sc_gamex:pos 175,320:mes"マス 縦"
+		pos 240,320:input sc_gamey:pos 295,320:mes"マス"
+		
+	pos 100,350:objsize 150,20:chkbox "Krone",sc_krone
+		objsize 50,20
+		pos 100,370:mes"横"
+		pos 120,370:input sc_kronex:pos 175,370:mes"マス 縦"
+		pos 240,370:input sc_kroney:pos 295,370:mes"マス"
+	
+	pos 100,400:objsize 150,20:chkbox "MusicPlayer",sc_mp
+		objsize 50,20
+		pos 100,420:mes"横"
+		pos 120,420:input sc_mpx:pos 175,420:mes"マス 縦"
+		pos 240,420:input sc_mpy:pos 295,420:mes"マス"
+	
+	//2行目	
+	pos 350,150:objsize 150,20:chkbox "電卓",sc_dentaku
+		objsize 50,20
+		pos 350,170:mes"横"
+		pos 370,170:input sc_dentakux:pos 425,170:mes"マス 縦"
+		pos 490,170:input sc_dentakuy:pos 545,170:mes"マス"
+	
+	pos 350,200:objsize 150,20:chkbox "テトリス",sc_tetris
+		objsize 50,20
+		pos 350,220:mes"横"
+		pos 370,220:input sc_tetrisx:pos 425,220:mes"マス 縦"
+		pos 490,220:input sc_tetrisy:pos 545,220:mes"マス"
+		
+	pos 350,250:objsize 150,20:chkbox "Twitter",sc_twitter
+		objsize 50,20
+		pos 350,270:mes"横"
+		pos 370,270:input sc_twitterx:pos 425,270:mes"マス 縦"
+		pos 490,270:input sc_twittery:pos 545,270:mes"マス"
+		
+	pos 350,300:objsize 150,20:chkbox "Facebook",sc_facebook
+		objsize 50,20
+		pos 350,320:mes"横"
+		pos 370,320:input sc_facebookx:pos 425,320:mes"マス 縦"
+		pos 490,320:input sc_facebooky:pos 545,320:mes"マス"
+	
+	//ここから下はウィジェット類
+	pos 600,150:objsize 250,20:chkbox "ウィジェット:大きめの時計（5マス×4マス）",w_bclock
+		objsize 50,20
+		pos 600,170:mes"横"
+		pos 620,170:input w_bclockx:pos 675,170:mes"マス 縦"
+		pos 740,170:input w_bclocky:pos 795,170:mes"マス"
+		
+	pos 600,200:objsize 250,20:chkbox "ウィジェット：小さめの時計（3マス×1マス）",w_sclock
+		objsize 50,20
+		pos 600,220:mes"横"
+		pos 620,220:input w_sclockx:pos 675,220:mes"マス 縦"
+		pos 740,220:input w_sclocky:pos 795,220:mes"マス"
+	
+	pos 600,250:objsize 250,20:chkbox "ウィジェット：検索ボックス（5マス×1マス）",w_search
+		objsize 50,20
+		pos 600,270:mes"横"
+		pos 620,270:input w_searchx:pos 675,270:mes"マス 縦"
+		pos 740,270:input w_searchy:pos 795,270:mes"マス"
+	
+	pos 600,300:objsize 250,20:chkbox "ウィジェット：天気予報（5マス×1マス）",w_weather
+		objsize 50,20
+		pos 600,320:mes"横"
+		pos 620,320:input w_weatherx:pos 675,320:mes"マス 縦"
+		pos 740,320:input w_weathery:pos 795,320:mes"マス"
+	
+	objimage 25, 0,0, 0,827, 0,455
+	pos 800,450:objsize 100,30:button gosub"この内容で設定",*shortcut_save
+	pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*shortcut_save
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*shortcut_save)"
+	notesel shortcuts
+	
+	noteadd "<mycon>",0,1
+	if sc_mycon=1:noteadd "1",1,1:else:noteadd "0",1,1
+	if sc_myconx="":sc_myconx=0:if sc_mycony="":sc_mycony=0
+	noteadd ""+sc_myconx+"",2,1:noteadd ""+sc_mycony+"",3,1//0の場合でも、とりあえず保存する
+	
+	noteadd "<app>",4,1
+	if sc_app=1:noteadd "1",5,1:else:noteadd "0",5,1
+	if sc_appx="":sc_appx="0":if sc_appy="":sc_appy="0"
+	noteadd ""+sc_appx+"",6,1:noteadd ""+sc_appy+"",7,1
+	
+	noteadd "<cp>",8,1
+	if sc_cp=1:noteadd "1",9,1:else:noteadd "0",9,1
+	if sc_cpx="":sc_cpx="0":if sc_cpy="":sc_cpy="0"
+	noteadd ""+sc_cpx+"",10,1:noteadd ""+sc_cpy+"",11,1
+	
+	noteadd "<game>",12,1
+	if sc_game=1:noteadd "1",13,1:else:noteadd "0",13,1
+	if sc_gamex="":sc_gamex="0":if sc_gamey="":sc_gamey="0"
+	noteadd ""+sc_gamex+"",14,1:noteadd ""+sc_gamey+"",15,1
+	
+	noteadd "<krone>",16,1
+	if sc_krone=1:noteadd "1",17,1:else:noteadd "0",17,1
+	if sc_kronex="":sc_kronex="0":if sc_kroney="":sc_kroney="0"
+	noteadd ""+sc_kronex+"",18,1:noteadd ""+sc_kroney+"",19,1
+	
+	noteadd "<MusicPlayer>",20,1
+	if sc_mp=1:noteadd "1",21,1:else:noteadd "0",21,1
+	if sc_mpx="":sc_mpx="0":if sc_mpy="":sc_mpy="0"
+	noteadd ""+sc_mpx+"",22,1:noteadd ""+sc_mpy+"",23,1
+	
+	noteadd "<dentaku>",24,1
+	if sc_dentaku=1:noteadd "1",25,1:else:noteadd "0",25,1
+	if sc_dentakux="":sc_dentakux="0":if sc_dentakuy="":sc_dentakuy="0"
+	noteadd ""+sc_dentakux+"",26,1:noteadd ""+sc_dentakuy+"",27,1
+	
+	noteadd "<tetris>",28,1
+	if sc_tetris="1":noteadd "1",29,1:else:noteadd "0",29,1
+	if sc_tetrisx="":sc_tetrisx="0":if sc_tetrisy="":sc_tetrisy="0"
+	noteadd ""+sc_tetrisx+"",30,1:noteadd ""+sc_tetrisy+"",31,1
+	
+	noteadd "<twitter>",32,1
+	if sc_twitter=1:noteadd "1",33,1:else:noteadd "0",33,1
+	if sc_twitterx="":sc_twitterx="0":if sc_twittery="":sc_twittery="0"
+	noteadd ""+sc_twitterx+"",34,1:noteadd ""+sc_twittery+"",35,1
+	
+	noteadd "<facebook>",36,1
+	if sc_facebook=1:noteadd "1",37,1:else:noteadd "0",37,1
+	if sc_facebookx="":sc_facebookx="0":if sc_facebooky="":sc_facebooky="0"
+	noteadd ""+sc_facebookx+"",38,1:noteadd ""+sc_facebooky+"",39,1
+	
+	noteadd "<Widget_bigclock>",40,1
+	if w_bclock=1:noteadd "1",41,1:else:noteadd "0",41,1
+	if w_bclockx="":w_bclockx="0":if w_bclocky="":w_bclocky="0"
+	noteadd ""+w_bclockx+"",42,1:noteadd ""+w_bclocky+"",43,1
+	
+	noteadd "<Widget_smallclock>",44,1
+	if w_sclock=1:noteadd "1",45,1:else:noteadd "0",45,1
+	if w_sclockx="":w_sclockx="0":if w_sclocky="":w_sclocky="0"
+	noteadd ""+w_sclockx+"",46,1:noteadd ""+w_sclocky+"",47,1
+	
+	noteadd "<Widget_SearchBox>",48,1
+	if w_search=1:noteadd "1",49,1:else:noteadd "0",49,1
+	if w_searchx="":w_searchx="0":if w_searchy="":w_searchy="0"
+	noteadd ""+w_searchx+"",50,1:noteadd ""+w_searchy+"",51,1
+	
+	noteadd "<Widget_Weather>",52,1
+	if w_weather=1:noteadd "1",53,1:else:noteadd "0",53,1
+	if w_weatherx="":w_weatherx="0":if w_weathery="":w_weathery="0"
+	noteadd ""+w_weatherx+"",54,1:noteadd ""+w_weathery+"",55,1
+	
+	notesave "data/shortcut.txt"
+	dialog"設定を変更しました"
+	return
+*dev
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*dev)"
+	#include"window.hsp"
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=1
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"開発者モード設定"
+	oldnow="cp"
+	close=*xcp
+	buttons
+	
+	pos 60,60:color 195,195,195:font "",30:mes"開発者モード設定"
+	line 25,100,900,100
+	color:font "",18
+	
+	oncmd gosub *createcheckbox, WM_CTLCOLORSTATIC
+	//チェックボックス類
+	objsize 250,20
+	pos 450,150
+	devmode=int(devmode)
+	chkbox "開発者モードのON/OFF",devmode
+	pos 450,200
+	dev_error=int(dev_error)
+	chkbox "エラー発生時にエラーの詳細を表示",dev_error
+	dev_label=int(dev_label)
+	chkbox "現在のラベルをタイトルに表示",dev_label
+	
+	objimage 25, 0,0, 0,827, 0,455:
+	pos 800,400:objsize 100,30:button"OK",*dev_save
+	pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*dev_save
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*dev_save)" :else: title titlename
+	configsave
+	notesave"data/config.dat"
+	
+	notesel devs
+	noteadd "<エラー発生時にエラーの詳細を表示>",0,1
+	noteadd ""+dev_error+"",1,1
+	noteadd "<現在のラベルをタイトルに表示>",2,1
+	noteadd ""+dev_label+"",3,1
+	notesave "data/developermode.txt"
+	dialog"設定を変更しました":stop
+	
+*createcheckbox
+	hBrush = GetSysColorBrush2(5)		;	ウィンドウ背景色のブラシを取得
+	return hBrush		;	ブラシのハンドルを返す
+	
+*weather_set
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*weather_set)"
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	#include"window.hsp"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"天気ウィジェット設定"
+	oldnow="cp"
+	close=*xcp
+	buttons
+	
+	pos 60,60:color 195,195,195:font "",30:mes"天気ウィジェット設定"
+	line 25,100,900,100
+	color:font "",18
+	
+	if sub=1:sub=0:return
+	
+	objimage 25, 0,0, 0,827, 0,455:objsize 200,30
+	pos 412,150
+	button"地域設定",*weather_tiiki
+	button"デザイン設定",*weather_design
+	pos 25,55:objsize 30,30:button"←",*returns
+	clock
+	stop
+*weather_tiiki
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*weather_tiiki)" :else: title titlename
+	sub=1:gosub*weather_set
+	pos 400,130:mes"お住いの地域を選択してください"
+	objimage 25, 0,0, 0,827, 0,455:objsize 200,30
+	pos 412,150
+	button"北海道地方",*hokkaido
+	button"東北地方",*tohoku
+	button"関東地方",*kanto
+	button"中部地方",*chubu
+	button"近畿地方",*kinki
+	button"中国・四国地方",*chugoku_shikoku
+	button"九州・沖縄地方",*kyushu_okinawa
+	
+	pos 25,55:objsize 30,30:button"←",*weather_set
+	clock
+	stop
+*hokkaido
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*hokkaido)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"北海道（宗谷）/稚内",*hsou_w:button"北海道（上川）/旭川",*hka_a
+	button"北海道（留萌）/留萌",*hr_r:button"北海道（オホーツク）/網走",*hoh_a
+	button"北海道（オホーツク）/北見",*hoh_k:button"北海道（オホーツク）/紋別",*hoh_m
+	button"北海道（根室）/根室",*hn_n:button"北海道（釧路）/釧路",*hku_k
+	pos 512,150
+	button"北海道（十勝）/帯広",*ht_o:button"北海道（石狩）/札幌",*his_s
+	button"北海道（空知）/岩見沢",*hsor_i:button"北海道（後志）/倶知安",*hsh_k
+	button"北海道（胆振）/室蘭",*hib_m:button"北海道（日高）/浦河",*hhid_u
+	button"北海道（渡島）/函館",*hos_h:button"北海道（檜山）/江差",*hhiy_e
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*hsou_w
+	buf="Wakkanai":w_url="1100":place_save
+*hka_a
+	buf="Asahikawa":w_url="1200":place_save
+*hr_r
+	buf="Rumoi":w_url="1300":place_save
+*hoh_a
+	buf="Abashiri":w_url="1710":place_save
+*hoh_k
+	buf="Kitami":w_url="1720":place_save
+*hoh_m
+	buf="Monbetsu":w_url="1730":place_save
+*hn_n
+	buf="Nemuro":w_url="1800":place_save
+*hku_k
+	buf="Kushiro":w_url="1900":place_save
+*ht_o
+	buf="Obihiro":w_url="2000":place_save
+*his_s
+	buf="Sapporo":w_url="1400":place_save
+*hsor_i
+	buf="Iwamisawa":w_url="1500":place_save
+*hsh_k
+	buf="kutchan":w_url="1600":place_save
+*hib_m
+	buf="Muroran":w_url="2100":place_save
+*hhid_u
+	buf="Urakawa":w_url="2200":place_save
+*hos_h
+	buf="Hakodate":w_url="2300":place_save
+*hhiy_e
+	buf="Esashi":w_url="2400":place_save
+*tohoku
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*tohoku)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"青森/青森",*thao_a:button"青森/むつ",*thao_m
+	button"青森/八戸",*thao_h:button"岩手/盛岡",*thi_mo
+	button"岩手/宮古",*thi_mi:button"岩手/大船渡",*thi_o
+	button"宮城/仙台",*thm_se:button"宮城/白石",*thm_sh
+	button"秋田/秋田",*thak_a
+	pos 512,150
+	button"秋田/横手",*thak_y:button"山形/山形",*thy_ya
+	button"山形/米沢",*thy_yo:button"山形/酒田",*thy_sa
+	button"山形/新庄",*thy_sh:button"福島/福島",*thf_f
+	button"福島/小名浜（いわき）",*thf_o:button"福島/若松（会津若松）",*thf_w
+	
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*thao_a
+	buf="Aomori":w_url="3110":place_save
+*thao_m
+	buf="Mutsu":w_url="3120":place_save
+*thao_h
+	buf="Hachinohe":w_url="3130":place_save
+*thi_mo
+	buf="Morioka":w_url="3310":place_save
+*thi_mi
+	buf="Miyako":w_url="3320":place_save
+*thi_o
+	buf="Ofunato":w_url="3330":place_save
+*thm_se
+	buf="Sendai":w_url="3410":place_save
+*thm_sh
+	buf="Shiraishi":w_url="3420":place_save
+*thak_a
+	buf="Akita":w_url="3210":place_save
+*thak_y
+	buf="Yokote":w_url="3220":place_save
+*thy_ya
+	buf="Yamagata":w_url="3510":place_save
+*thy_yo
+	buf="Yonezawa":w_url="3520":place_save
+*thy_sa
+	buf="Sakata":w_url="3530":place_save
+*thy_sh
+	buf="Shinjo":w_url="3540":place_save
+*thf_f
+	buf="Fukushima":w_url="3610":place_save
+*thf_o
+	buf="Onahama":w_url="3620":place_save
+*thf_w
+	buf="Wakamatsu":w_url="3630":place_save
+*kanto
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*kanto)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150	
+	button"東京/東京",*kttok_t:button"東京/大島",*kttok_o
+	button"東京/八丈島",*kttok_h:button"東京/父島",*kttok_c
+	button"神奈川/横浜",*ktk_y:button"神奈川/小田原",*ktk_o
+	button"埼玉/さいたま",*kts_s:button"埼玉/熊谷",*kts_k
+	button"埼玉/秩父",*kts_c:button"千葉/千葉",*ktc_chi
+	pos 512,150
+	button"千葉/銚子",*ktc_cho:button"千葉/館山",*ktc_t
+	button"茨城/水戸",*kti_m:button"茨城/土浦",*kti_t
+	button"栃木/宇都宮",*kttoc_u:button"栃木/大田原",*kttoc_o
+	button"群馬/前橋",*ktg_ma:button"群馬/みなかみ",*ktg_mi
+	button"山梨/甲府",*kty_ko:button"山梨/河口湖（富士河口湖）",*kty_ka
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*kttok_t
+	buf="Tokyo":w_url="4410":place_save
+*kttok_o
+	buf="Oshima":w_url="4420":place_save
+*kttok_h
+	buf="Hachijojima":w_url="4430":place_save
+*kttok_c
+	buf="Chichijima":w_url="4440":place_save
+*ktk_y
+	buf="Yokohama":w_url="4610":place_save
+*ktk_o
+	buf="Odawara":w_url="4620":place_save
+*kts_s
+	buf="Saitama":w_url="4310":place_save
+*kts_k
+	buf="Kumagaya":w_url="4320":place_save
+*kts_c
+	buf="Chichibu":w_url="4330":place_save
+*ktc_chi
+	buf="Chiba":w_url="4510":place_save
+*ktc_cho
+	buf="Choshi":w_url="4520":place_save
+*ktc_t
+	buf="Tateyama":w_url="4530":place_save
+*kti_m
+	buf="Mito":w_url="4010":place_save
+*kti_t
+	buf="Tsuchiura":w_url="4020":place_save
+*kttoc_u
+	buf="Utsunomiya":w_url="4110":place_save
+*kttoc_o
+	buf="Ohtawara":w_url="4120":place_save
+*ktg_ma
+	buf="Maebashi":w_url="4210":place_save
+*ktg_mi
+	buf="Minakami":w_url="4220":place_save
+*kty_ko
+	buf="Kofu":w_url="4910":place_save
+*kty_ka
+	buf="Kawaguchiko":w_url="4920":place_save
+*chubu
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*chubu)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"新潟/新潟",*cbni_ni:button"新潟/長岡",*cbni_na
+	button"新潟/高田",*cbni_t:button"新潟/相川（佐渡）",*cbni_a
+	button"長野/長野",*cbna_n:button"長野/松本",*cbna_m
+	button"長野/飯田",*cbna_i:button"富山/富山",*cbt_t
+	button"富山/伏木（高岡）",*cbt_f:button"石川/金沢",*cbi_k
+	button"石川/輪島",*cbi_w
+	pos 512,150
+	button"福井/福井",*cbf_f:button"福井/敦賀",*cbf_t
+	button"愛知/名古屋",*cba_n:button"愛知/豊橋",*cba_t
+	button"岐阜/岐阜",*cbg_g:button"岐阜/高山",*cbg_t
+	button"静岡/静岡",*cbs_s:button"静岡/網代（熱海）",*cbs_a
+	button"静岡/三島",*cbs_m:button"静岡/浜田",*cbs_h
+	button"三重/津",*cbm_t:button"三重/尾鷲",*cbm_o
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*cbni_ni
+	buf="Niigata":w_url="5410":place_save
+*cbni_na
+	buf="Nagaoka":w_url="5420":place_save
+*cbni_t
+	buf="Takada":w_url="5430":place_save
+*cbni_a
+	buf="Aikawa":w_url="5440":place_save
+*cbna_n
+	buf="Nagano":w_url="4810":place_save
+*cbna_m
+	buf="Matsumoto":w_url="4820":place_save
+*cbna_i
+	buf="Iida":w_url="4830":place_save
+*cbt_t
+	buf="Toyama":w_url="5510":place_save
+*cbt_f
+	buf="Fushiki":w_url="5520":place_save
+*cbi_k
+	buf="Kanazawa":w_url="5610":place_save
+*cbi_w
+	buf="Wajima":w_url="5620":place_save
+*cbf_f
+	buf="Fukui":w_url="5710":place_save
+*cbf_t
+	buf="Tsuruga":w_url="5720":place_save
+*cba_n
+	buf="Nagoya":w_url="5110":place_save
+*cba_t
+	buf="Toyohashi":w_url="5120":place_save
+*cbg_g
+	buf="Gifu":w_url="5210":place_save
+*cbg_t
+	buf="Takayama":w_url="5220":place_save
+*cbs_s
+	buf="Shizuoka":w_url="5010":place_save
+*cbs_a
+	buf="Ajiro":w_url="5020":place_save
+*cbs_m
+	buf="Mishima":w_url="5030":place_save
+*cbs_h
+	buf="Hamamatsu":w_url="5040":place_save
+*cbm_t
+	buf="Tsu":w_url="5310":place_save
+*cbm_o
+	buf="Owase":w_url="5320":place_save
+*kinki
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*kinki)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"大阪/大阪",*kio_o:button"兵庫/神戸",*kih_k
+	button"兵庫/豊岡",*kih_t:button"京都/舞鶴",*kik_m
+	button"京都/京都",*kik_k:button"滋賀/大津",*kis_o
+	pos 512,150
+	button"滋賀/彦根",*kis_h:button"奈良/奈良",*kin_n
+	button"奈良/風屋（十津川）",*kin_k::button"和歌山/和歌山",*kiw_w
+	button"和歌山/潮岬（串本）",*kiw_s
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*kio_o
+	buf="Osaka":w_url="6200":place_save
+*kih_k
+	buf="Kobe":w_url="6310":place_save
+*kih_t
+	buf="Toyooka":w_url="6320":place_save
+*kik_m
+	buf="Maizuru":w_url="6120":place_save
+*kik_k
+	buf="Kyoto":w_url="6110":place_save
+*kis_o
+	buf="Otsu":w_url="6010":place_save
+*kis_h
+	buf="Hikone":w_url="6020":place_save
+*kin_n
+	buf="Nara":w_url="6410":place_save
+*kin_k
+	buf="Kazeya":w_url="6420":place_save
+*kiw_w
+	buf="Wakayama":w_url="6510":place_save
+*kiw_s
+	buf="Shionomisaki":w_url="6520":place_save
+*chugoku_shikoku
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*chugoku_shikoku)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"鳥取/鳥取",*cstot_t:button"鳥取/米子",*cstot_y
+	button"島根/松江",*css_m:button"島根/浜田",*css_h
+	button"島根/西郷（隠岐の島）",*css_s:button"岡山/岡山",*cso_o
+	button"岡山/津山",*cso_t:button"広島/広島",*csh_h
+	button"広島/庄原",*csh_s:button"山口/下関",*csy_s
+	button"山口/山口",*csy_yam
+	pos 512,150
+	button"山口/柳井",*csy_yan
+	button"山口/萩",*csy_h:button"徳島/徳島",*cstok_t
+	button"徳島/日和佐（美波）",*cstok_h:button"香川/高松",*cska_t
+	button"愛媛/松山",*cse_m:button"愛媛/新居浜",*cse_n
+	button"愛媛/宇和島",*cse_u:button"高知/高知",*csko_k
+	button"高知/室戸",*csko_m:button"高知/清水（土佐清水）",*csko_s
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*cstot_t
+	buf="Tottori":w_url="6910":place_save
+*cstot_y
+	buf="Yonago":w_url="6920":place_save
+*css_m
+	buf="Matsue":w_url="6810":place_save
+*css_h
+	buf="Hamada":w_url="6820":place_save
+*css_s
+	buf="Saigo":w_url="6830":place_save
+*cso_o
+	buf="Okayama":w_url="6610":place_save
+*cso_t
+	buf="Tsuyama":w_url="6620":place_save
+*csh_h
+	buf="Hiroshima":w_url="6710":place_save
+*csh_s
+	buf="Shobara":w_url="6720":place_save
+*csy_s
+	buf="Shimonoseki":w_url="8110":place_save
+*csy_yam
+	buf="Yamaguchi":w_url="8120":place_save
+*csy_yan
+	buf="Yanai":w_url="8130":place_save
+*csy_h
+	buf="Hagi":w_url="8140":place_save
+*cstok_t
+	buf="Tokushima":w_url="7110":place_save
+*cstok_h
+	buf="Hiwasa":w_url="7120":place_save
+*cska_t
+	buf="Takamatsu":w_url="7200":place_save
+*cse_m
+	buf="Matsuyama":w_url="7310":place_save
+*cse_n
+	buf="Niihama":w_url="7320":place_save
+*cse_u
+	buf="Uwajima":w_url="7330":place_save
+*csko_k
+	buf="Kochi":w_url="7410":place_save
+*csko_m
+	buf="Muroto":w_url="7420":place_save
+*csko_s
+	buf="Shimizu":w_url="7430":place_save
+*kyushu_okinawa
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*kyushu_okinawa)" :else: title titlename
+	sub=1:gosub*weather_set
+	objimage 25,0,0,0,827,0,455:objsize 200,20
+	pos 300,130:mes"お住いの地域を選択してください"
+	
+	pos 312,150
+	button"福岡/福岡",*kof_f:button"福岡/八幡（北九州）",*kof_y
+	button"福岡/飯塚",*kof_i:button"福岡/久留米",*kof_k
+	button"佐賀/佐賀",*kos_s:button"佐賀/伊万里",*kos_i
+	button"長崎/長崎",*kon_n:button"長崎/佐世保",*kon_s
+	button"長崎/厳原（対馬）",*kon_i:button"長崎/福江（五島）",*kon_f
+	button"熊本/熊本",*koku_k:button"熊本/阿蘇乙姫（阿蘇）",*koku_a
+	button"熊本/牛深",*koku_u:button"熊本/人吉",*koku_h
+	button"大分/大分",*kooi_o:button"大分/中津",*kooi_n
+	button"大分/日田",*kooi_h
+	pos 512,150
+	button"大分/佐伯",*kooi_s
+	button"宮崎/宮崎",*kom_miyaz:button"宮崎/延岡",*kom_n
+	button"宮崎/都城",*kom_miyak:button"宮崎/高千穂",*kom_t
+	button"鹿児島/名瀬",*koka_n:button"鹿児島/鹿児島",*koka_kag
+	button"鹿児島/鹿屋",*koka_kan:button"鹿児島/種子島",*koka_t
+	button"沖縄/那覇",*kook_nah:button"沖縄/名護",*kook_nag
+	button"沖縄/久米島",*kook_k:button"沖縄/南大東",*kook_min
+	button"沖縄/宮古島",*kook_miy:button"沖縄/石垣島",*kook_i
+	button"沖縄/与那国島",*kook_y
+	pos 25,55:objsize 30,30:button"←",*weather_tiiki
+	clock
+	stop
+*kof_f
+	buf="Fukuoka":w_url="8210":place_save
+*kof_y
+	buf="Yahata":w_url="8220":place_save
+*kof_i
+	buf="Iizuka":w_url="8230":place_save
+*kof_k
+	buf="Kurume":w_url="8240":place_save
+*kos_s
+	buf="Saga":w_url="8510":place_save
+*kos_i
+	buf="Imari":w_url="8520":place_save
+*kon_n
+	buf="Nagasaki":w_url="8410":place_save
+*kon_s
+	buf="Sasebo":w_url="8420":place_save
+*kon_i
+	buf="Izuhara":w_url="8430":place_save
+*kon_f
+	buf="Fukue":w_url="8440":place_save
+*koku_k
+	buf="Kumamoto":w_url="8610":place_save
+*koku_a
+	buf="Asootohime":w_url="8620":place_save
+*koku_u
+	buf="Ushibuka":w_url="8630":place_save
+*koku_h
+	buf="Hiyoshi":w_url="8640":place_save
+*kooi_o
+	buf="Oita":w_url="8310":place_save
+*kooi_n
+	buf="Nakatsu":w_url="8320":place_save
+*kooi_h
+	buf="Hita":w_url="8330":place_save
+*kooi_s
+	buf="Saiki":w_url="8340":place_save
+*kom_miyaz
+	buf="Miyazaki":w_url="8710":place_save
+*kom_n
+	buf="Nobeoka":w_url="8720":place_save
+*kom_miyak
+	buf="Miyakonojo":w_url="8730":place_save
+*kom_t
+	buf="Kagoshima":w_url="8810":place_save
+*koka_n
+	buf="Naze":w_url="1000":place_save
+*koka_kag
+	buf="Kagoshima":w_url="8810":place_save
+*koka_kan
+	buf="Kanoya":w_url="8820":place_save
+*koka_t
+	buf="Tanegashima":w_url="8830":place_save
+*kook_nah
+	buf="Naha":w_url="9110":place_save
+*kook_nag
+	buf="Nago":w_url="9120":place_save
+*kook_k
+	buf="Kumejima":w_url="9130":place_save
+*kook_min
+	buf="Minamidaito":w_url="9200":place_save
+*kook_miy
+	buf="Miyakojima":w_url="9300":place_save
+*kook_i
+	buf="Ishigakijima":w_url="9410":place_save
+*kook_y
+	buf="Yonagunijima":w_url="9420":place_save
+
+*weather_design
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*weather_design)" :else: title titlename
+	sub=1:gosub*weather_set
+	
+	pos 200,130:mes"背景の設定"
+	objsize 100,30:objimage 25, 0,0, 0,827, 0,455
+	pos 212,150:button"なし",*wd_no
+	pos 312,150:button"空",*wd_sky
+	pos 412,150:button"ウィンドウ色",*wd_color
+	pos 512,150:button"青",*wd_blue
+	pos 612,150:button"緑",*wd_green
+	pos 712,150:button"半透明（黒）",*wd_h
+	
+	pos 200,200:mes"表示設定"
+	oncmd gosub *createcheckbox, WM_CTLCOLORSTATIC
+	objsize 200,20
+	tenki_moji=int(tenki_moji):tenki_yahoo=int(tenki_yahoo)
+	pos 212,220:chkbox "天気の文字表示",tenki_moji
+	pos 212,240:chkbox "Powered by Yahoo Japanの表示",tenki_yahoo
+	objsize 100,20
+	pos 600,240:button"保存",*wd_hyoji
+	
+	pos 25,55:objsize 30,30:button"←",*weather_set
+	clock
+	stop
+*wd_no
+	wd_haikei="no"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_sky
+	wd_haikei="sky"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_color
+	wd_haikei="color"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_blue
+	wd_haikei="blue"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_green
+	wd_haikei="green"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_h
+	wd_haikei="hantoumei"
+	configsave
+	notesave"data/config.dat"
+	stop
+*wd_hyoji
+	configsave
+	notesave"data/config.dat"
+	stop
+	
+*infomation_on_desktop
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*weather_set)"
+	#include"window.hsp"
+	ifcp=1
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=0
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifupdate=0
+	ifshortcut=0
+	ifdev=0
+	pos 30,20
+	gmode 2:gcopy 4,0,0,32,32
+	objsize 100,30
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"デスクトップでのお知らせの表示"
+	
+	close=*xcp
+	buttons
+	
+	pos 60,60:color 195,195,195:font "",30:mes"デスクトップでのお知らせの表示"
+	line 25,100,900,100
+	color:font "",18
+	
+	objimage 25, 0,0, 0,827, 0,455:objsize 200,30
+	pos 412,150
+	button"ON",*info_on
+	button"OFF",*info_off
+	pos 25,55:objsize 30,30:button"←",*cp
+	clock
+	stop
+*info_on
+	iod=1
+	configsave
+	notesave"data/config.dat"
+	stop
+*info_off
+	iod=0
+	configsave
+	notesave"data/config.dat"
+	stop
+
+;-----------------------------------内蔵アプリ----------------------------------------
+*net ;ブラウザ
+	s_e=""
+*net2
+	if krone_startup=0{
+		cls:pos 0,0:gcopy 142,0,0,1024,576	//起動後1回きり表示
+		wait 100
+		krone_startup=1
+	}
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*net)"
+	#include "krone.hsp"
+	stop
+*exitnet
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*exitnet)"
+	objmode 1 //オブジェクトの文字を元に戻す
+	if now="app":goto*app
+	if now="startmenu":goto*menu
+	goto*desktop//どれにも当てはまらない場合
+*googlekeyword
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*googlekeyword)"
+	//Google検索
+	s_e="google"
+	goto*net2
+*yahookeyword
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*yahookeyword)"
+	//Yahoo検索
+	s_e="yahoo"
+	goto*net2
+*Twitter
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*twitter)"
+	s_e="twitter"
+	goto*net2
+*FB
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*FB)"
+	s_e="fb"
+	goto*net2
+*DL
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*DL)"
+	cls
+	s_e="DL"
+	goto*net2
+;ここまでブラウザ
+
+*memo
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*memo)"
+	imemo=imemo+1
+	if imemo=1:imemox=30+x:x=x+30
+	notopenw=1
+	
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	:color r,g,b:boxf 0,0,1024,30
+	
+	color 255,255,255:pos 50,5:mes"Y-MemoPad"
+	sdim buf, 4048
+	pos 0,60
+	mesbox buf, 1024, 486
+	color 255,255,255:boxf 0,30,1024,60
+	pos 0,30
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 5,1
+	button"",*mstop
+	objsize 100,30
+	pos 5,30:button".txtを開く",*txtload
+	pos 106,30:button".wtfを開く",*wtfload
+	pos 207,30:button".hspを開く",*hspload
+	pos 308,30:button".txtで保存",*txtsave
+	pos 409,30:button".wtfで保存",*wtfsave
+	pos 510,30:button".hspで保存",*hspsave
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*xmemo
+	
+	pos 15,1
+	gcopy 17,0,0,30,30
+	
+	#include "tskbutton.hsp"
+	clock
+	stop
+*mclear
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*mclear)"
+	objprm 0, ""
+	stop
+*mstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*mstop)"
+	stop
+*txtsave
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*txtsave)"
+	dialog "txt", 17,"テキスト"
+	if stat = 0 : stop
+	notesel buf
+	notesave refstr
+	stop
+*wtfsave
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*wtfsave)"
+	dialog "wtf", 17,"Walls Text File"
+	if stat = 0 : stop
+	notesel buf
+	notesave refstr
+	stop
+*hspsave
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*hspsave)"
+	dialog "hsp", 17,"HSPスクリプトエディタ"
+	if stat = 0 : stop
+	notesel buf
+	notesave refstr
+	stop
+*txtload
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*txtload)"
+	dialog "txt", 16, "テキスト"
+	if stat = 0 : stop
+	notesel data
+	noteload refstr
+	objprm 0, data
+	objprm 1, data
+	stop
+*wtfload
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*wtfload)"
+	dialog "wtf", 16, "Walls Text File"
+	if stat = 0 : stop
+	notesel data
+	noteload refstr
+	objprm 0, data
+	objprm 1, data
+	stop
+*hspload
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*hspload)"
+	dialog "hsp", 16, "HSPスクリプトエディタ"
+	if stat = 0 : stop
+	notesel data
+	noteload refstr
+	objprm 0, data
+	objprm 1, data
+	stop
+*sonotaload
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*sonotaload)"
+	dialog "", 16, "その他のファイル"
+	if stat = 0 : stop
+	notesel data
+	noteload refstr
+	objprm 0, data
+	objprm 1, data
+	stop
+*xmemo
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xmemo)"
+	imemo=0
+	x=x-30
+	if imemox<iax:iax=iax-30
+	if imemox<icx:icx=icx-30
+	if imemox<icontx:icontx=icontx-30
+	if imemox<imx:imx=imx-30
+	if imemox<igx:igx=igx-30
+	if imemox<icfx:icfx=icfx-30
+	if imemox<idfx:idfx=idfx-30
+	if imemox<igux:igux=igux-30
+	imemox=0
+	goto*desktop
+	stop
+;ここまでメモ帳
+	
+*MP ;Music Player
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*MP)"
+	oldnow=now
+	now="MP"
+	notopenw=1
+	
+	GetWindowLongA2 hwnd , -20 
+	SetWindowLongA2 hwnd , -20 , stat | 0x00080000
+	#uselib "shell32.dll"
+	#func DragAcceptFiles "DragAcceptFiles" int,int
+	#func DragQueryFile   "DragQueryFileA"  int,int,int,int
+	#func DragQueryPoint  "DragQueryPoint"  int,int
+	#func DragFinish      "DragFinish"      int
+
+	#define WM_DROPFILES      0x0233
+
+	title"Music Player - "+titlename+"
+	#uselib "shell32.dll"
+	
+	objimage 25, 0,0, 0,827, 0,455
+	im=im+1
+	if im=1:imx=30+x:x=x+30
+	
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+
+	if sub=0{
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		pos 500,506:button gosub "Choose",*mp_open
+		pos 600,506:button "PLAY", *sound_play
+		pos 700,506:button "STOP", *sound_stop
+	}
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_mp
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*xmmp
+	objimage 27
+	pos 964,0
+	objsize 30,30
+	button "",*desktop_notmmstop
+	
+; メッセージ処理の登録
+	oncmd gosub *OnDropFiles, WM_DROPFILES
+
+; ドロップファイルの受け入れを設定
+	DragAcceptFiles hwnd, 1
+	if stat == 0 {
+		mmload"data/open.mp3":mmplay
+    dialog "設定に失敗しました。", 1, "エラー"
+    end
+	}
+	color 195,195,195:boxf 0,0,1024,30
+	
+	color :gmode 4,,,128
+	boxfa 0,30,1024,546
+	
+	pos 15,1
+	gmode 2:gcopy 16,0,0,32,32
+	pos 280,250
+	color 255,255,255
+	mes "再生したいファイルをここにドラック＆ドロップするか、\n「Choose」ボタンを押してファイルを選択してください"
+	pos 50,5
+	mes"Music Player"
+	if sub=1:sub=0:return
+	#include "tskbutton.hsp"
+	clock
+	stop
+
+*OnDropFiles
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*OnDropFiles)"
+; ====== ファイルがドロップされたときの処理 ======
+	hDrop = wparam                    ; データ構造体のハンドル
+
+
+; ファイルの数の取得
+	DragQueryFile hDrop, -1, 0, 0     ; 第2パラメータを -1 に
+	filecount = stat                  ; ドロップされたファイル数
+
+; ファイル名の取得（ドロップされたファイルの数だけ実行）
+	sdim filename, 260                ; ファイル名を格納するバッファ
+	repeat filecount
+    DragQueryFile hDrop, cnt, varptr(filename), 260
+    mmload filename:mmplay
+    title"再生中（"+filename+"） - Music Player - "+titlename+"
+	loop
+
+; ドロップファイル用のメモリを解放
+	DragFinish hDrop
+	return 0
+
+*mp_open
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*mp_open)"
+	dialog "mp3;*.wav;*.mid;*.wma", 16, "音楽ファイル"
+
+	if stat = 0:stop//キャンセルした場合
+	filename=refstr
+	chdir dirinfo(1)//カレントフォルダを元に戻す
+	
+*sound_play
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*sound_play)"
+	mmload filename:mmplay 
+	title"再生中（"+filename+"） - Music Player - "+titlename+"
+	stop
+
+*sound_stop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*sound_stop)"
+	mmstop 
+	title"再生停止中 - Music Player - "+titlename+"
+	stop
+*xmmp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xmmp)"
+	im=0
+	x=x-30
+	xmp=xmp+1
+	if imx<iax:iax=iax-30
+	if imx<icx:icx=icx-30
+	if imx<icontx:icontx=icontx-30
+	if imx<imx:imx=imx-30
+	if imx<igx:igx=igx-30
+	if imx<icfx:icfx=icfx-30
+	if imx<idfx:idfx=idfx-30
+	if imx<igux:igux=igux-30
+	if imx<imemox:imemox=imemox-30
+	imx=0
+	goto*desktop
+	stop
+*menu_mp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_mp)"
+	if sm="small":sub=1:gosub*MP//スタートメニューが小サイズの場合、サブルーチンをONにして*myconへジャンプ
+	#include "startmenu.hsp"
+	stop
+;ここまでMusic Player
+
+*guide
+	cls
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*guide)"
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	
+	oldnow=now
+	now="guide"
+	
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*xguide
+
+	color 195,195,195:boxf 0,0,1024,30
+	color :gmode 4,,,128
+	boxfa 0,30,1024,546
+	
+	pos 15,1
+	gcopy 58,0,0,32,32
+	color 255,255,255
+	pos 70,5:mes"ヘルプ"
+
+	if sub=0:pos 130,60:gmode 0:gcopy 143,0,0,768,432
+	
+	objimage 25,0,0,0,827,0,455:objsize 100,30
+	if sub=0{
+		pos 100,500:button"更新ができない場合",*guide1
+		pos 210,500:button"ショートカットの設定",*guide2
+	}
+	pos 320,500:button"バグ報告の手順",*guide3
+	pos 700,500:button"スタッフロール",*staffroll
+	pos 810,500:button"再生停止",*guide
+	
+	#include "tskbutton.hsp"
+	if sub=1:sub=0:return
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu_guide
+	if gsub=1:gsub=0:return
+	
+	igu=igu+1
+	if igu=1:igux=30+x:x=x+30
+	
+	clock
+	stop
+*guide1
+	clrobj
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*guide1)"
+	sub=0:gsub=1:gosub*guide
+	pos 130,60:mmload"img/help/help1.wmv":mmplay
+	clock
+*guide2
+	clrobj
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*guide2)"
+	sub=0:gsub=1:gosub*guide
+	pos 130,60:mmload"img/help/help2.wmv":mmplay
+	clock
+*guide3
+	clrobj
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*guide2)"
+	sub=0:gsub=1:gosub*guide
+	pos 130,60:mmload"img/help/help3.wmv":mmplay
+	clock
+*staffroll
+	clrobj
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*guide2)"
+	sub=0:gsub=1:gosub*guide
+	pos 130,60:mmload"img/help/staffroll.wmv":mmplay
+	clock
+*xguide
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*xguide)"
+	igu=0
+	xgu=xgu+1
+	x=x-30
+	
+	if igux<iax:iax=iax-30
+	if igux<icx:icx=icx-30
+	if igux<icontx:icontx=icontx-30
+	if igux<imx:imx=imx-30
+	if igux<igx:igx=igx-30
+	if igux<icfx:icfx=icfx-30
+	if igux<idfx:idfx=idfx-30
+	if igux<imemox:imemox=imemox-30
+	igux=0
+	goto*desktop
+	stop
+*menu_guide
+	mmstop
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*menu_guide)"
+	if sm="small":sub=1:gosub*guide
+	#include "startmenu.hsp"
+	clock
+	stop
+	
+;------------------------------外部アプリ---------------------------------
+*dentaku
+	exec"app/dentaku/dentaku.exe"
+	clock
+*ramen
+	exec"app/3min/3mintaime.exe"
+	clock
+*tetris
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*tetris)"
+	#include "tetris.hsp"
+	stop
+*paint
+	exec"app/peint/peint.exe"
+	clock
+*rpg
+	exec"app/rpg/史上最悪なRPG.exe"
+	stop
+*gmail
+	exec"app/gmail/gmail.exe"
+	stop
+*TE
+	exec"app/tabexplorer/tabexplorer.exe"
+	stop
+*dentakuz
+	exec"app/消費税計算機Z/消費税計算機Z.exe"
+	stop
+	
+;-----------------------------シャットダウン、再起動など-------------------------------
+*shuryo
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*shuryo)"
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	
+	objsize 100,30
+	objimage 25, 0,0, 0,827, 0,455
+	if sm="big"{
+		pos 874,40:button"再起動",*restarting
+		button"シャットダウン",*shutdown
+		button"キャンセル",*menu
+	}else{
+		color :gmode 3,,,128
+		boxfa 250,10,370,120
+		pos 260,20:button"再起動",*restarting
+		pos 260,50:button"シャットダウン",*shutdown
+		pos 260,80:button"キャンセル",*desktop
+	}
+	clock
+	stop
+*restarting
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*reset)"
+	;再起動
+	cls
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	mmload"music/shuryo.mp3":mmplay
+	wait 500
+	color ,,,:boxf
+	color 255,255,255
+	pos 430,450
+	mes"終了しています..."
+	restart=1
+	cls
+	color ,,,:boxf
+	pos 300,450
+	wait 500
+	goto*bios
+*restart2
+	notesel vns
+	noteload"data/vn.txt"
+	noteget vn,1
+	exec vn
+	end
+*shutdown
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*shutdown)"
+	;シャットダウン
+	clrobj
+	pos 0,0
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	shutk=0
+	ksk=1
+	repeat
+		if xl<0:break
+		ksk=ksk*2
+		shutk=shutk+ksk
+		color 0,100,255:boxf 0,0,shutk,576
+		wait 8
+	loop
+	mmload"music/shuryo.mp3":mmplay
+	
+	//See you!と表示させる
+	seeyoux=0
+	gsk=456
+	repeat
+	redraw 0
+		color 0,100,255:boxf
+		gsk=gsk/2
+		seeyoux=seeyoux+gsk //最終的には450,244で止まる
+		color 255,255,255:font "",36
+		pos seeyoux,244
+		mes"See you!"
+		if seeyoux>450:break
+		wait 5
+	redraw 1
+	loop
+	wait 200
+	
+	seeyouy=244
+	ksk=1
+	repeat
+	redraw 0
+		if seeyouy<-30:break
+		color 0,100,255:boxf
+		ksk=ksk*2
+		seeyouy=seeyouy-ksk
+		color 255,255,255:font "",36
+		pos 450,seeyouy
+		mes"See you!"
+		wait 5
+	redraw 1
+	loop
+	wait 100
+	goto*exit
+*logoff
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*logoff)"
+	gcopy 72,0,0,1024,576
+	pos 50,370
+	color 255,255,255
+	font "",20:mes ""+gettime(0)+"年"+gettime(1)+"月"+gettime(3)+"日"
+	font "",144:mes ""+ji+":"+fun+""
+	font "",20
+	pos 900,504:objsize 100,30:button"ログイン",*passin
+	stop
+
+*exit
+	//onexit
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*exit)"
+	RemoveFontMemResourceEx hFont
+	end
+
+;-------------------------return、goto類---------------------------------------
+*ifmycon
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ifmycon)"
+	if ifc=1:goto*c
+	if ifd=1:goto*d
+	if ifm=1:goto*mycon
+*ifscp
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*ifscp)"
+	if ifcp=1:goto*cp
+	if ifpass=1:goto*passhenko
+	if ifke=1:goto*ke
+	if ifname=1:goto*namehenko
+	if ifhk=1:goto*hk1
+	if ifbutton=1:goto*colorchange
+	if ifhantome=1:goto*hantome
+	if ifphoto=1:goto*userphoto
+	if ifupdate=1:goto*update
+	if ifshortcut=1:goto*shortcut
+	if ifdev=1:goto*dev
+	
+*chk
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*chk)"
+	if apu="ah":mmload"music/ah.mp3"
+	mmload "music/apu.mp3":mmplay
+	#include "apu.hsp"
+	stop
+*chk_desk
+	;デスクトップ画面表示時のapu
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*chk_desk)"
+	if apu="ah":mmload"music/ah.mp3"
+	mmload "music/apu.mp3":mmplay
+	#include "apu.hsp"
+	stop
+	
+*sm_click
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*sm_click)"
+	
+	//デスクトップのボタン類
+	if sc_myconx2<= mousex & sc_myconx2+30 >= mousex and sc_mycony2<= mousey & sc_mycony2+30 >= mousey and now="desktop"{
+		goto*mycon
+	}
+	if sc_appx2<= mousex & sc_appx2+30 >= mousex and sc_appy2<= mousey & sc_appy2+30 >= mousey and now="desktop"{
+		goto*app
+	}
+	if sc_cpx2<= mousex & sc_cpx2+30 >= mousex and sc_cpy2<= mousey & sc_cpy2+30 >= mousey and now="desktop"{
+		goto*cp
+	}
+	if sc_gamex2<= mousex & sc_gamex2+30 >= mousex and sc_gamey2<= mousey & sc_gamey2+30 >= mousey and now="desktop"{
+		goto*game
+	}
+	if sc_kronex2<= mousex & sc_kronex2+30 >= mousex and sc_kroney2<= mousey & sc_kroney2+30 >= mousey and now="desktop"{
+		goto*net
+	}
+	if sc_mpx2<= mousex & sc_mpx2+30 >= mousex and sc_mpy2<= mousey & sc_mpy2+30 >= mousey and now="desktop"{
+		goto*MP
+	}
+	if sc_dentakux2<= mousex & sc_dentakux2+30 >= mousex and sc_dentakuy2<= mousey & sc_dentakuy2+30 >= mousey and now="desktop"{
+		goto*dentaku
+	}
+	if sc_tetrisx2<= mousex & sc_tetrisx2+30 >= mousex and sc_tetrisy2<= mousey & sc_tetrisy2+30 >= mousey and now="desktop"{
+		goto*tetris
+	}
+	if sc_twitterx2<= mousex & sc_twitterx2+30 >= mousex and sc_teittery2<= mousey & sc_twittery2+30 >= mousey and now="desktop"{
+		goto*twitter
+	}
+	if sc_facebookx2<= mousex & sc_facebookx2+30 >= mousex and sc_facebooky2<= mousey & sc_facebooky2+30 >= mousey and now="desktop"{
+		goto*FB
+	}
+	
+	//タスクバーのボタン類
+	if icx<= mousex & icx+30 >= mousex and 546<= mousey & 576 >= mousey and ic>0{
+		goto*mycon
+	}
+	if iax<= mousex & iax+30 >= mousex and 546<= mousey & 576 >= mousey and ia>0{
+		goto*app
+	}
+	if icontx<= mousex & icontx+30 >= mousex and 546<= mousey & 576 >= mousey and icont>0{
+		goto*cp
+	}
+	if imx<= mousex & imx+30 >= mousex and 546<= mousey & 576 >= mousey and im>0{
+		goto*MP
+	}
+	if igx<= mousex & igx+30 >= mousex and 546<= mousey & 576 >= mousey and ig>0{
+		goto*game
+	}
+	if igux<= mousex & igux+30 >= mousex and 546<= mousey & 576 >= mousey and igu>0{
+		goto*guide
+	}
+	if imemo<= mousex & imemo+30 >= mousex and 546<= mousey & 576 >= mousey and imemo>0{
+		goto*memo
+	}
+	
+	//スタートメニューの右側のボタン類
+	if 250<= mousex & 1024>= mousex and 546<=mousey & 576>= mousey and sm="small" and smopen=1{
+		goto*returns
+	}
+	
+	if 300<= mousex & 450 >= mousex and 80<= mousey & 200 >= mousey and sm="big" and smopen=1{
+		ifcp=0
+		ifpass=0
+		ifke=0
+		ifname=0
+		ifhk=0
+		ifbutton=0
+		ifhantome=1
+		ifphoto=0
+		ifupdate=0
+		ifshortcut=0
+		ifdev=0
+	
+		icont=icont+1
+		if icont=1:icontx=30+x:x=x+30
+		smopen=0
+		goto*hantome
+	}
+	
+	if 460<= mousex & 610 >= mousex and 80<= mousey & 200>= mousey and sm="big" and smopen=1{
+		ifcp=0
+		ifpass=0
+		ifke=0
+		ifname=0
+		ifhk=0
+		ifbutton=0
+		ifhantome=0
+		ifphoto=0
+		ifupdate=0
+		ifshortcut=1
+		ifdev=0
+		
+		icont=icont+1
+		if icont=1:icontx=30+x:x=x+30
+		smopen=0
+		goto*shortcut
+	}
+	
+	if 620<= mousex & 770 >= mousex and 80<= mousey & 200>= mousey and sm="big" and smopen=1{
+		smopen=0
+		goto*error_houkoku
+	}
+	
+	if 780<= mousex & 930>= mousex and 80<=mousey & 200>= mousey and sm="big" and smopen=1{
+		ifcp=0
+		ifpass=0
+		ifke=0
+		ifname=0
+		ifhk=0
+		ifbutton=0
+		ifhantome=0
+		ifphoto=0
+		ifupdate=0
+		ifshortcut=o
+		ifdev=0
+		
+		icont=icont+1
+		if icont=1:icontx=30+x:x=x+30
+		smopen=0
+		goto*weather_tiiki
+	}
+	
+	
+	if 984<= mousex & 1014>= mousex and 10<=mousey & 40>= mousey and sm="big" and smopen=1{
+		newsm="small"
+		nonmessage=1
+		configsave
+		noteadd newsm,18,1
+		notesave "data/config.dat"
+		smopen=0
+		goto*menu
+	}
+	
+	if 180<= mousex & 210>= mousex and 30<=mousey & 60>= mousey and sm="small"and smopen=1{
+		newsm="big"
+		nonmessage=1
+		configsave
+		noteadd newsm,18,1
+		notesave "data/config.dat"
+		smopen=0
+		goto*menu
+	}
+	
+	//ウィンドウの外でクリックしたとき
+	if 0<= mousex & 1024 >= mousex and 0<= mousey & 19 >= mousey and notopenw=0:goto*desktop
+	if 0<= mousex & 19 >= mousex and 0<= mousey & 546 >= mousey and notopenw=0:goto*desktop
+	if 1005<= mousex & 1024 >= mousex and 0<= mousey & 546 >= mousey and notopenw=0:goto*desktop
+	if 0<= mousex & 1024 >= mousex and 512<= mousey & 546 >= mousey and notopenw=0:goto*desktop
+		
+	if notopenw=1:return :else:stop//どこにも当てはまらない場合
+	
+*returns
+	;戻る（←）ボタンをおした時のジャンプ先
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*returns)"
+	if oldnow="":goto*desktop
+	if oldnow="mycon":goto*mycon
+	if oldnow="app":goto*app
+	if oldnow="cp":goto*cp
+	if oldnow="MP":goto*MP
+	if oldnow="game":goto*game
+	if oldnow="c":goto*c
+	if oldnow="d":goto*d
+	if oldnow="guide":goto*guide
+	if oldnow="desktop":goto*desktop
+	clock
+	
+;-----------------------------情報表示類----------------------------------
+*info
+	clrobj
+	pos 0,0
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	
+	#include "tskbutton.hsp"
+	
+	color r,g,b
+	gmode 3,,,128
+	boxfa 0,0,1024,546
+		
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*info)"
+	
+	pos 10,3:color 255,255,255:font "",48:mes"infomation"
+	line 0,50,1024,50
+	color:font "",18
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*desktop
+	
+	color 255,255,255
+	pos 230,200:mes ""+titlename+" (128Bit)\n"+version+"\n"+build+"\nプロセッサー：Hittel(R) GodCore(TM) i292 CPU\n 　　　　　　　　 M7000 @51.91GHz\nユーザーネーム："+uname+"\nMade by YotioSoft Co., Ltd."
+	gmode 2:pos 80,200:gmode 0:gcopy 99,0,0,124,124
+	
+	objimage 25, 0,0, 0,827, 0,455
+	pos 700,200:objsize 200,30
+	button"YotioSoftについて",*about_yotiosoft
+	button"リリースノート(Waterloo SP2以降)",*releasenote
+	button"不具合のご報告",*error_houkoku
+	button"最新版の確認",*update
+	button"ダウングレード",*downgrade
+	
+	clock
+	stop
+*about_yotiosoft
+	notesel buf
+	noteload"data/about.txt"
+	
+	clrobj
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*desktop
+	
+	color 255,255,255
+	pos 650,230:mes buf
+	
+	objimage 25, 0,0, 0,827, 0,455
+	pos 650,200:objsize 30,30:button"←",*info
+
+	#include"tskbutton.hsp"
+	clock
+*releasenote
+	notesel buf
+	noteload"data/releasenote.txt"
+	
+	clrobj
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	objimage 3
+	pos 994,0
+	objsize 30,30
+	button "",*desktop
+	
+	color 255,255,255
+	pos 650,230:mes buf
+	
+	objimage 25, 0,0, 0,827, 0,455
+	pos 650,200:objsize 30,30:button"←",*info
+	
+	#include"tskbutton.hsp"
+	clock
+	
+*jiho
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*jiho)"
+	;時報音の読み込み
+	notesel buf
+	noteload "data/config.dat":noteget jihouon,20
+	js=0
+	color 255,255,255:boxf 874,496,1024,515
+	font "",18
+	color 0,191,255:pos 885,498:mes ""+gettime(0)+"/"+gettime(1)+"/"+gettime(3)+"
+	repeat
+	redraw 1
+	js=js+1
+	color 255,255,255:boxf 874,515,1024,546
+	font "",30
+	
+	j6=gettime(6)
+	ji=gettime (4):fun=gettime (5)
+	if ji<10:ji="0"+ji+""
+	if fun<10:fun="0"+fun+""
+	if j6<10:j6="0"+j6+""
+	
+	if jihouon="clock"{
+		if js=1{
+			mmload "music/jc1.mp3":mmplay
+		}
+	}
+	if jihouon="jiho_on"{
+		if js=1{
+			if j6="00"{
+				mmload "music/jj2.mp3":mmplay
+			}
+			if 05 <= j6 & 59 >=j6:mmload "music/jj1.mp3":mmplay
+		}
+	}
+	if jihouon="poo"{
+		if js=1{
+			if j6="00"{
+				mmload "music/jo2.mp3":mmplay
+			}else{
+				mmload "music/jo1.mp3":mmplay
+			}
+		}
+	}
+	color 0,191,255:pos 895,515:mes ""+ji+":"+fun+" "+j6+""
+	if js=2:js=0
+	wait 50
+	redraw 1
+	loop
+	stop
+	
+*weather
+	#include"weather.hsp"
+	
+*error
+	cls
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*error)"
+	oldnow=now
+	color 0,162,232:boxf
+	
+	if devmode=1&dev_error=1:goto*error2
+	
+	pos 312,0:gcopy 130,0,0,400,400
+	errors
+	pos 450,440:mes"申し訳ございません"
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 100,30
+	pos 412,500:button"無視して続行する",*returns
+	pos 512,500:button"強制終了",*exit
+	stop
+	
+*error2
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode label=*error2)"
+	errornumber=wparam
+	if errornumber=1{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 450,440:mes"内容：システムエラーが発生しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=2{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 450,440:mes"内容：文法が間違っています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=3{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 445,440:mes"内容：パラメータの値が異常です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=4{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：計算式でエラーが発生しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=5{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 445,440:mes"内容：パラメータの省略はできません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=6{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：パラメータの型が違います\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=7{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 450,440:mes"内容：配列の要素が無効です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=8{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：有効なラベルが指定されていません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=9{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：サブルーチンやループのネストが深すぎます\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=10{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：サブルーチン外のreturnは無効です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=11{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：repeat外でのloopは無効です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=12{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：ファイルが見つからないか無効な名前です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=13{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 450,440:mes"内容：画像ファイルがありません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=14{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：外部ファイル呼び出し中のエラーです\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=15{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：計算式でカッコの記述が違います\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=16{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 450,440:mes"内容：パラメータの数が多すぎます\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=17{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：文字列式で扱える文字数を越えました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=18{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 445,440:mes"内容：代入できない変数名を指定しています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=19{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 450,440:mes"内容：0で除算しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=20{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：バッファオーバーフローが発生しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=21{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：サポートされない機能を選択しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=22{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 445,440:mes"内容：計算式のカッコが深すぎます\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=23{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 445,440:mes"内容：変数名が指定されていません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=24{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 445,440:mes"内容：整数以外が指定されています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=25{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：配列の要素書式が間違っています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=26{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：メモリの確保ができませんでした\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=27{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：タイプの初期化に失敗しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=28{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：関数に引数が設定されていません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=29{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：スタック領域のオーバーフローです\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=30{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：無効な名前がパラメーターに指定されています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=31{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：異なる型を持つ配列変数に代入しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=32{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：関数のパラメーター記述が不正です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=33{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 445,440:mes"内容：オブジェクト数が多すぎます\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=34{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：配列・関数として使用できない型です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=35{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 440,440:mes"内容：モジュール変数が指定されていません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=36{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 440,440:mes"内容：モジュール変数の指定が無効です\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=37{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 450,440:mes"内容：変数型の変換に失敗しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=38{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 445,440:mes"内容：外部DLLの呼び出しに失敗しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=39{
+		pos 312,0:gcopy 130,0,0,400,400
+		errors
+		pos 440,440:mes"内容：外部オブジェクトの呼び出しに失敗しました\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=40{
+		pos 312,0:gcopy 132,0,0,400,400
+		errors
+		pos 445,440:mes"内容：関数の戻り値が設定されていません\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	if errornumber=41{
+		pos 312,0:gcopy 131,0,0,400,400
+		errors
+		pos 445,440:mes"内容：関数を命令として記述しています\nエラー番号："+errornumber+"\nエラー行："+lparam+"行目"
+	}
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 100,30
+	pos 312,500:button"無視して続行する",*returns
+	pos 412,500:button"エラーの詳細",*error_details
+	pos 512,500:button"報告する",*error_houkoku
+	pos 612,500:button"強制終了",*exit
+	stop
+	
+*error_details
+	exec "http://www.onionsoft.net/hsp/v33/doclib/error.htm", 16
+	stop
+*error_houkoku
+	exec "http://www2.hp-ez.com/hp/ytanifreesoft/page39", 16
+	stop

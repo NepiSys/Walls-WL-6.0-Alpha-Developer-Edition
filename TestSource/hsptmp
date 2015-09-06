@@ -1,0 +1,18 @@
+
+#uselib "gdi32.dll"
+#cfunc CreateDC "CreateDCA" sptr,sptr,sptr,int
+#func DeleteDC "DeleteDC"  int
+#func BitBlt "BitBlt" int,int,int,int,int,int,int,int,int
+buffer 2, ginfo_dispx, ginfo_dispy
+screen 1,ginfo_dispx,ginfo_dispy
+width 400,300
+gsel 0,-1
+repeat
+gsel 2
+hdcd = CreateDC("DISPLAY", 0, 0, 0)
+BitBlt hdc, 0, 0, ginfo_dispx, ginfo_dispy, hdcd, 0, 0, 0x00CC0020 |0x40000000
+DeleteDC hdcd
+gsel 1
+	gzoom ginfo_winx,ginfo_winy,2,0,0,ginfo_dispx,ginfo_dispy
+await 1000/60
+loop

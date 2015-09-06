@@ -1,0 +1,169 @@
+; 今作はJH7UBC様の電卓を改造させていただきました。 
+	title "電卓"
+	screen 0,315,300,0
+	cls 2
+;定数、変数初期値
+	x0=10:y0=250:op=1:f=0:dc=0:sc=0
+	R1=0.0:R2=0.0:M=0.0:b=0.0:of=0
+	font "",12
+	buffer 1
+	picload"button.png"
+	gsel 0,1
+;キー配置
+	objimage 1
+	sdim K,2,25
+	K="0","00",".","＋","＝","1","2","3","－","√","4","5","6","×","％","7","8","9","÷","MR","AC","CE","MC","M+","M-"
+	objsize 59,40
+	for i,0,25
+		y=i/5
+		x=i\5
+  		pos x0+x*59,y0-y*40
+  		button K(i),*keyin  		
+  	next
+
+*hyoji
+	color 255,255,255;表示のための枠
+	boxf 20,20,295,70
+	d=str(R1)
+	l=strlen (d)
+	i=l-1
+*loop1
+	color 0,0,0
+	font "",18
+	c=strmid(d,i,1)
+	if c="0" {n=i:i=i-1:goto *loop1} else {n=i+1}
+	if c="." :n=n-1
+	if n>15 :gosub *over:n=13:color 0,0,0:font "",18;表示文字数が13文字以上ならｵｰﾊﾞﾌﾛｰ
+	dd=strmid(d,0,n)
+	for j,0,n
+		dsp=strmid(dd,j,1)
+		x=290+(j-n)*11
+		pos x,38
+		mes dsp
+	next
+	
+	if M!0:color 0,0,255:font "",10:pos 25,50:mes "M";メモリー表示
+	if ef=1:color 255,0,0:font "",10:pos 25,35:mes "ERROR";エラー表示
+	stop
+*over
+	color 255,0,0:font "",10:pos 25,20:mes "OVER";オーバーフロー表示
+	return
+
+;ボタンが押されたら、各ボタンの処理へジャンプ
+*keyin
+	a=K(stat)
+	b=int(a)
+	if a="AC":goto *ac
+	if ef=1:stop
+	if b>0 :goto *suuji
+	if a="0":goto *suuji
+	if a="00":goto *suuji0
+	if a=".":goto *dot
+	if a="＋":goto *tasu
+	if a="－":goto *hiku
+	if a="×":goto *kakeru
+	if a="÷":goto *waru
+	if a="CE":goto *ce
+	if a="MC":goto *mc
+	if a="M+":goto *mp
+	if a="M-":goto *mm
+	if a="MR":goto *mr
+	if a="％":goto *parcent
+	if a="√":goto *root
+	if a="＝":goto *eq
+
+;数字キーが押されたときの処理
+*suuji
+	if f=1 :R1=0.0:f=0				;直前に演算記号が押されていたら、R1をクリア
+	sc=sc+1
+	if (sc>12)|(dc>6) :stop
+	if dc=0 :R1=R1*10+b:goto *hyoji	;小数点が押されていなければ、前の数字を桁上げし、新たな数字を足す。
+		i=0
+*dotloop
+	  	b=0.1*b
+	  	i=i+1
+	  	if i!dc :goto *dotloop
+		R1=R1+b
+		dc=dc+1
+	goto *hyoji
+
+*suuji0	;"00"キーが押されたときの処理
+	if f=1 : R1=0.0
+	if dc=0 :R1=R1*100:goto *hyoji	;"."キーが押されていなければ、２桁桁上げ
+	dc=dc+2							;"."キーが押されていれば、小数点以下２桁下げ
+	goto *hyoji
+	
+*dot	;"."が押されれば、ドットカウンタをセット
+	dc=1
+	goto *hyoji
+	
+*tasu	;"+"が押された時の処理
+	gosub *keisan
+	op=1:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*hiku	;"-"が押された時の処理
+	gosub *keisan
+	op=2:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*kakeru	;"×"が押された時の処理
+	gosub *keisan
+	op=3:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*waru	;"÷"が押された時の処理
+	gosub *keisan
+	op=4:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*ac;"AC"が押されたら、R1,R2,M各メモリをクリアし、演算記号に＋をセットし、各フラッグを下ろす。
+	R1=0.0:R2=0.0:M=0.0:op=1:f=0:dc=0:sc=0:ef=0
+	goto *hyoji
+	
+*ce;"CE"が押されたら、R1をクリア
+	R1=0.0:sc=0
+	goto *hyoji
+	
+*mc;メモリークリア
+	M=0.0
+	goto *hyoji
+	
+*mp;"M+"が押されたら、R1をメモリMに足す。
+	M=M+R1
+	op=1:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*mm;"M-"が押されたら、R1からメモリMを引く。
+	M=M-R1
+	op=1:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*mr
+	R1=M
+	goto *hyoji
+	
+*parcent
+	gosub *keisan
+	R1=R2*100:R2=0.0
+	op=1:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*root
+	R1=sqrt(R1)
+	op=1:f=1:dc=0:sc=0
+	goto *hyoji
+	
+*eq;＝が押された時の処理
+	gosub *keisan	;直前の演算子の計算
+	if ef=1 :goto *hyoji
+	op=1:f=1:R1=R2:R2=0.0:dc=0	;演算子に＋をセット。R2をR1に移し、クリア
+	goto *hyoji
+	stop
+  
+*keisan
+	if op=1:R2=R2+R1	;＋の計算
+	if op=2:R2=R2-R1	;－の計算
+	if op=3:R2=R2*R1	;×の計算
+	if op=4:if R1=0 {ef=1} else {R2=R2/R1}	;÷の計算、０で割られたらエラーを表示へ
+return

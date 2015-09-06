@@ -1,0 +1,209 @@
+;スタートメニューソース(*単体では動作しません)
+
+;スタートメニューのサイズを読み込み
+	if devmode=1&dev_label=1:title ""+titlename+" (devmode startmenu.hsp)"
+	notesel sms
+	noteload "data/config.dat":noteget sm,18
+	notopenw=1
+	smopen=1
+	onclick gosub *sm_click
+	#include "tskbutton.hsp"
+	if sm="big"{
+		clrobj
+		
+		color r,g,b
+		gmode 3,,,128
+		boxfa 0,0,1024,546
+		
+		pos 1014,546
+		objimage 25, 0,0, 0,827, 0,455:objsize 10,30
+		button"",*jiho
+	
+		color 255,255,255
+		if windowcolor="white"|"yellow"|"orange":color
+	
+		objimage 1,0,0,0,30,0,30
+		pos 0,546
+		objsize 30,30
+		if now="mycon":button"",*mycon
+		if now="app":button"",*app
+		if now="cp":button"",*cp
+		if now="MP":button"",*MP
+		if now="game":button"",*game
+		if now="c":button"",*c
+		if now="d":button"",*d
+		if now="desktop":button"",*desktop
+		if now="guide":button"",*guide
+		
+		pos 10,10:mes titlename
+		mes""+version+"\nユーザー名:"+uname+"
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		pos 10,80
+	
+	    objimage 81
+		objsize 150,100
+		button"",*mycon
+		pos 160,80:objimage 82
+		objsize 75,50
+		button"",*c
+		pos 160,130:objimage 83
+		objsize 75,50
+		button"",*d
+		pos 10,180:objimage 84
+		objsize 150,100
+		button"",*app
+		pos 160,180:objimage 85
+		objsize 75,50
+		button"",*game
+		pos 160,230:objimage 86
+		objsize 75,50
+		button"",*net
+		pos 10,280:objimage 87
+		objsize 225,50
+		button"",*TE
+		pos 10,330:objimage 88
+		objsize 225,100
+		button"",*CP
+		pos 10,430:objimage 89
+		objsize 113,50
+		button"",*MP
+		pos 123,430:objimage 90
+		objsize 112,25
+		button"",*info
+		pos 123,455:objimage 91
+		objsize 112,25
+		button"",*update
+		pos 10,480:objimage 92
+		objsize 113,50
+		button"",*DL
+		pos 123,480:objimage 93
+		objsize 112,50
+		button"",*guide
+		
+		objimage 25, 0,0, 0,827, 0,455:objsize 100,30
+		pos 674,10:button"ログオフ",*logoff
+		pos 774,10:button"デスクトップへ",*desktop
+		pos 874,10:objimage 94, 0,0, 0,100, 0,30
+		objsize 100,30
+		button"",*shuryo
+	
+		gmode 2
+		pos 984,10:gcopy 135,0,0,30,30
+		
+		pos 300,80:gcopy 133,0,0,150,100
+			pos 330,180:mes"半透明度設定"
+		pos 460,80:if windowcolor="white"|"yellow"{
+						gcopy 134,0,100,150,200
+					}else{
+						gcopy 134,0,0,150,100
+					}
+			pos 470,180:mes"ショートカット設定"
+		pos 620,80:gcopy 141,0,0,150,100
+			pos 660,180:mes"バグ報告"
+		pos 780,80:gcopy 178,0,0,150,100
+			pos 820,180:mes"地域設定"
+		
+		if ic>0:pos icx,546:gmode 2:gcopy 4,0,0,30,30;もしもicが1以上になっていたらicx(位置の変数),546に「マイコンピュータ」ボタンを表示する
+		if ia>0:pos iax,546:gmode 2:gcopy 2,0,0,30,30
+		if icont>0:pos icontx,546:gmode 2:gcopy 106,0,0,30,30
+		if im>0:pos imx,546:gmode 2:gcopy 16,0,0,30,30
+		if ig>0:pos igx,546:gmode 2:gcopy 2,0,0,30,30
+		if igu>0:pos igux,546:gmode 2:gcopy 58,0,0,30,30
+		if imemo>0:pos imemox,546:gmode 2:gcopy 113,0,0,30,30
+		
+		;apu
+		pos 545,546:gcopy 107,0,0,30,30
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 250,20
+		pos 585,550:input apus
+		objsize 50,20
+		pos 850,550:button"OK",*chk
+	
+		#include"tskbutton.hsp"
+	}
+
+	if sm="small"{
+		pdx = ax, bx, bx, ax
+		pdy = ay, ay, by, by
+		gsquare -1,pdx, pdy
+		color r,g,b:gmode 3,,,128
+		boxfa 0,0,250,546
+		
+		objimage 1,0,0,0,30,0,30
+		pos 0,546
+		objsize 30,30
+		if now="desktop":button"",*desktop
+		if now="mycon":button"",*mycon
+		if now="app":button "",*app
+		if now="cp":button"",*cp
+		if now="MP":button"",*MP
+		if now="game":button"",*game
+		if now="c":button"",*c
+		if now="d":button"",*d
+		if now="guide":button"",*guide
+		
+		color 255,255,255
+		
+		notesel buf
+		noteload "data/jouhou.txt"
+	;	結果が返る変数用に256バイト分のバッファ確保
+		sdim password, 256
+		noteget password, 1
+		
+		pos 10,10:mes titlename
+		font "",18
+		mes""+version+"\nユーザー名:"+uname+"
+		objimage 25, 0,0, 0,827, 0,455
+		objsize 100,30
+		pos 10,80
+	
+	    objimage 81
+		objsize 150,100
+		button"",*mycon
+		pos 160,80:objimage 82
+		objsize 75,50
+		button"",*c
+		pos 160,130:objimage 83
+		objsize 75,50
+		button"",*d
+		pos 10,180:objimage 84
+		objsize 150,100
+		button"",*app
+		pos 160,180:objimage 85
+		objsize 75,50
+		button"",*game
+		pos 160,230:objimage 86
+		objsize 75,50
+		button"",*net
+		pos 10,280:objimage 87
+		objsize 225,50
+		button"",*TE
+		pos 10,330:objimage 88
+		objsize 225,100
+		button"",*CP
+		pos 10,430:objimage 89
+		objsize 113,50
+		button"",*MP
+		pos 123,430:objimage 90
+		objsize 112,25
+		button"",*info
+		pos 123,455:objimage 91
+		objsize 112,25
+		button"",*update
+		pos 10,480:objimage 92
+		objsize 113,50
+		button"",*DL
+		pos 123,480:objimage 93
+		objsize 112,50
+		button"",*guide
+	
+		gmode 2
+		pos 180,30:gcopy 135,0,0,30,30
+		
+		pos 210,30:objimage 94
+		objsize 30,30
+		button"",*shuryo
+	
+		#include"tskbutton.hsp"
+	}

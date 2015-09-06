@@ -1,0 +1,1290 @@
+*hk1
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	
+	icont=icont+1
+	if icont=1:icontx=30+x:x=x+30
+	
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color:pos 300,60:mes"1：雪山"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 28,0,0,350,196
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk26:pos 510,400:mes"1":pos 530,400:button"→",*hk2
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh1
+
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh1
+	haikei=str("1")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk2
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"2.トンネル"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 29,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk1:pos 510,400:mes"2":pos 530,400:button"→",*hk3
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh2
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh2
+	haikei=str("2")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk3
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"3.木漏れ日"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 30,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk2:pos 510,400:mes"3":pos 530,400:button"→",*hk4
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh3
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh3
+	haikei=str("3")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk4
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"4.名古屋城"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 31,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk3:pos 510,400:mes"4":pos 530,400:button"→",*hk5
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh4
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh4
+	haikei=str("4")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk5
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"5.善光寺"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 32,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk4:pos 510,400:mes"5":pos 530,400:button"→",*hk6
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh5
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh5
+	haikei=str("5")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk6
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"6.仙台駅前"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 33,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk5:pos 510,400:mes"6":pos 530,400:button"→",*hk7
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh6
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh6
+	haikei=str("6")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk7
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"7.新宿のビル群"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 34,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk6:pos 510,400:mes"7":pos 530,400:button"→",*hk8
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh7
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh7
+	haikei=str("7")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk8
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"8.軍艦島の廃墟1"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 35,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk7:pos 510,400:mes"8":pos 530,400:button"→",*hk9
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh8
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh8
+	haikei=str("8")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk9
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"9.軍艦島の廃墟2"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 36,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk8:pos 510,400:mes"9":pos 530,400:button"→",*hk10
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh9
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh9
+	haikei=str("9")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk10
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"10.長崎の教会"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 37,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk9:pos 510,400:mes"10":pos 530,400:button"→",*hk11
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh10
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh10
+	haikei=str("10")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk11
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"11.パリ"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 38,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk10:pos 510,400:mes"11":pos 530,400:button"→",*hk12
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh11
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	color
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh11
+	haikei=str("11")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk12
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"12.海辺"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 39,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk11:pos 510,400:mes"12":pos 530,400:button"→",*hk13
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh12
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh12
+	haikei=str("12")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk13
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"13.福岡"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 40,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk12:pos 510,400:mes"13":pos 530,400:button"→",*hk14
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh13
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh13
+	haikei=str("13")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk14
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"14.千本鳥居"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 41,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk13:pos 510,400:mes"14":pos 530,400:button"→",*hk15
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh14
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh14
+	haikei=str("14")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk15
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"15.草"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 42,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk14:pos 510,400:mes"15":pos 530,400:button"→",*hk16
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh15
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh15
+	haikei=str("15")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk16
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"16.滝"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 43,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk15:pos 510,400:mes"16":pos 530,400:button"→",*hk17
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh16
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh16
+	haikei=str("16")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk17
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"17.阿蘇山"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 44,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk16:pos 510,400:mes"17":pos 530,400:button"→",*hk18
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh17
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh17
+	haikei=str("17")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk18
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"18.大きな公園"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 108,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk17:pos 510,400:mes"18":pos 530,400:button"→",*hk19
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh18
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh18
+	haikei=str("18")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk19
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"19.北海道の朝"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 109,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk18:pos 510,400:mes"19":pos 530,400:button"→",*hk20
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh19
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh19
+	haikei=str("19")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk20
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"20.近未来的なトンネル"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 110,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk19:pos 510,400:mes"20":pos 530,400:button"→",*hk21
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh20
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh20
+	haikei=str("20")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk21
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"21.カラーボール"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 111,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk20:pos 510,400:mes"21":pos 530,400:button"→",*hk22
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh21
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh21
+	haikei=str("21")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk22
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"22.立体空間1"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 116,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk21:pos 510,400:mes"22":pos 530,400:button"→",*hk23
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh22
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh22
+	haikei=str("22")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk23
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"23.立体空間2"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 117,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk22:pos 510,400:mes"23":pos 530,400:button"→",*hk24
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh23
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh23
+	haikei=str("23")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk24
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"24.壁（Wall）"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 118,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk23:pos 510,400:mes"24":pos 530,400:button"→",*hk25
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh24
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh24
+	haikei=str("24")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk25
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"25.棒"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 119,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk24:pos 510,400:mes"25":pos 530,400:button"→",*hk26
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh25
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh25
+	haikei=str("25")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop
+*hk26
+	cls
+	ifcp=0
+	ifpass=0
+	ifke=0
+	ifname=0
+	ifhk=1
+	ifbutton=0
+	ifhantome=0
+	ifphoto=0
+	ifstyle=0
+	#include "window.hsp"
+	pos 30,20
+	gcopy 4,0,0,32,32
+	color 255,255,255
+	color:pos 300,60:mes"26.四角い箱"
+	color 255,255,255:boxf 330,80,680,330
+	pos 330,110:gcopy 120,0,0,350,250
+	pos 300,350
+	color
+	objimage 25, 0,0, 0,827, 0,455
+	pos 450,400:objsize 50,30:button"←",*hk25:pos 510,400:mes"26":pos 530,400:button"→",*hk1
+	objsize 100,30:pos 700,400:button"画像を参照...",*gazos
+	objsize 100,30:button"これにする",*hh26
+	
+	objimage 1,0,0,0,30,0,30
+	pos 0,546
+	objsize 30,30
+	button "",*menu
+	color 255,255,255
+	pos 70,25:mes"コントロールパネル"
+	objimage 3
+	pos 974,20
+	objsize 30,30
+	button "",*xcp
+	objimage 27
+	pos 944,20
+	objsize 30,30
+	button "",*desktop
+	objimage 25, 0,0, 0,827, 0,455:pos 25,55:objsize 30,30:button"←",*cp 
+	color
+	#include "tskbutton.hsp"
+	stop
+*hh26
+	haikei=str("26")
+	configsave:notesave "data/config.dat"
+	dialog"背景を変更しました。\n再起動すると変更が反映されます。"
+	goto*haikeihenko2
+	stop

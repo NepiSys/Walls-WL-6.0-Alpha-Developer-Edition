@@ -1,0 +1,89 @@
+ldim IconLabel,8196
+#module WallWindowAPI
+//製作者: NEPISAT
+
+//addWindow タイトル,タイトルの部分の大きさ,ウインドウサイズX,ウインドウサイズY,ウインドウ表示場所X,ウインドウ表示場所Y,ウインドウID(=BufferID）
+//べっ別にいちいちwidthとかtitleとか作るのが大変だったから パラメータが多くなったわけじゃないんだからね!!
+#deffunc addWindow str WinTitle,int TitY,int WinSX,int WinSY,int WinPX,int WinPY,int WinID
+buffer WinID,WinSX+1,WinSY+1
+color 255,100,0
+boxf 0,0,WinSX,TitY
+line 0,WinSY,0,0
+line WinSX,TitY,WinSX,WinSY
+line WinSX,WinSY,0,WinSY
+pos 0,TitY/2-8
+color 255,255,255
+if(TitY!=0){
+mes WinTitle
+color 255,0,0
+boxf WinSX,0,WinSX-30,TitY
+color 255,255,255
+pos WinSX-20,TitY/2-8
+mes "X"
+}
+winposx@.length(winposx@)=WinPX
+winposy@.length(winposy@)=WinPY
+winsizex@.length(winsizex@)=WinSX
+winsizey@.length(winsizey@)=WinSY
+wintilesizey@.length(wintilesizey@)=TitY
+win@.length(win@)=WinID
+gsel 0,1
+return
+#deffunc ChangeWindowsTitle str ChangeWindowsTitle_Str,int ChangeWindowsTitle_WID
+if(Check_WID(ChangeWindowsTitle_WID)==1){
+	gsel ChangeWindowsTitle_WID,1
+	
+}
+return
+
+//BufferIDがWindowIDとして使われているかを確認します。
+//Check_WID 　ウインドウID
+//戻り値: 使われていた場合 : 1 それ以外: 0
+#defcfunc Check_WID int Check_WID_WID
+repeat length(win@)
+	if(win@.cnt==Check_WID_WID){
+		return 1
+	}
+loop
+return 0
+//addWindow 画像名,アイコン順番X(posではなく1から始まり次の列は2),アイコン順番Y(posではなく1から始まり次の列は2),アイコンID(BufferID),ジャンプ先ラベル(gosub)
+//べっ別にめんどくさかったから Window部分と同じにしたわけじゃないんだからね!!
+#define global addIcon(%1,%2,%3,%4,%5) ADMT@WallWindowAPI=%1 : ADPX@WallWindowAPI=%2 : ADPY@WallWindowAPI=%3 : ADMI@WallWindowAPI=%4 : adlabel@WallWindowAPI=%5 : _addIcon ADMT@WallWindowAPI,ADPX@WallWindowAPI,ADPY@WallWindowAPI,ADMI@WallWindowAPI,adlabel@WallWindowAPI
+#deffunc _addIcon str MIconTitle,int MIconPX,int MIconPY,int MIconID,var _addIcon_Label
+buffer MIconID,IconSize@,IconSize@
+tmpIcon=ginfo_newid
+buffer tmpIcon
+picload MIconTitle
+iconsx=ginfo_winx
+iconsy=ginfo_winy
+gsel MIconID
+gzoom IconSize@,IconSize@,tmpIcon,0,0,iconsx,iconsy
+MIconposx@.length(MIconposx@)=MIconPX
+MIconposy@.length(MIconposy@)=MIconPY
+MIcon@.length(MIcon@)=MIconID
+IconLabel@.length(IconLabel@)=adlabel@WallWindowAPI
+gsel 0,1
+return
+
+
+
+//addWindow 画像名,アイコン順番X(posではなく1から始まり次の列は2),アイコン順番Y,アイコンID(BufferID),ジャンプ先ラベル(gosub)
+//これは。。。あれだ! 継承がないのが悪い
+#define global addTaskIcon(%1,%2,%3,%4,%5) ATDMT@WallWindowAPI=%1 : ATDPX@WallWindowAPI=%2 : ATDPY@WallWindowAPI=%3 : ATDMI@WallWindowAPI=%4 : aTdlabel@WallWindowAPI=%5 : _addTaskIcon ATDMT@WallWindowAPI,ATDPX@WallWindowAPI,ATDPY@WallWindowAPI,ATDMI@WallWindowAPI,aTdlabel@WallWindowAPI
+#deffunc _addTaskIcon str MTIconTitle,int MTIconPX,int MTIconPY,int MTIconID,var _addTIcon_Label
+
+return
+
+//CloseWindow ウインドウID(BufferID): ウインドウを閉じる
+#deffunc CloseWin int CloseingWindowID
+win@.CloseingWindowID=0
+winposx@.CloseingWindowID=0
+winposy@.CloseingWindowID=0
+winsizex@.CloseingWindowID=0
+winsizey@.CloseingWindowID=0
+wintilesizey@.CloseingWindowID=0
+//CloseIcon ウインドウID(BufferID): ウインドウを閉じる
+#deffunc CloseIcon int CloseingIconID
+win@.CloseingIconID=0
+return
+#global

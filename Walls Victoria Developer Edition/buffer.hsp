@@ -1,0 +1,308 @@
+;-----------------------------------------
+	;画像読み込み＆バッファ
+	buffer 1
+	picload"ico/start.png"
+	buffer 2
+	picload"ico/file.png"
+	buffer 3
+	picload"ico/x.png"
+	buffer 4
+	picload"ico/mycon.png"
+	buffer 5
+	picload"ico/gazo.png"
+	buffer 6
+	picload"ico/ongaku.png"
+	buffer 7
+	picload"ico/tetris.png"
+	buffer 8
+	picload"ico/file2.png"
+	buffer 9
+	picload"ico/memo.png"
+	buffer 10
+	picload"ico/dentaku.png"
+	buffer 11
+	picload"ico/firebox.png"
+	buffer 12
+	picload"ico/ramen.png"
+	buffer 13
+	picload"ico/mycon2.png"
+	buffer 14
+	picload"ico/sd.png"
+	buffer 15
+	picload kabegami
+	buffer 16
+	picload"ico/ongaku2.png"
+	buffer 17 
+	picload"ico/memo2.png"
+	buffer 22
+	picload"ico/twitter.png"
+	buffer 23
+	picload"ico/fb.png"
+	buffer 24
+	picload"ico/paint.png"
+	buffer 25
+	picload"img/buttonimg.png"//ボタン
+	buffer 26
+	picload"ico/firebox2.png"
+	buffer 27
+	picload"ico/saishouka.jpg"
+	;---------------------------------デスクトップ背景プレビュー読み込み-----------------------------------
+	buffer 28
+	picload"desktop/Preview/desktop.jpg"
+	buffer 29
+	picload"desktop/Preview/desktop2.jpg"
+	buffer 30
+	picload"desktop/Preview/desktop3.jpg"
+	buffer 31
+	picload"desktop/Preview/desktop4.jpg"
+	buffer 32
+	picload"desktop/Preview/desktop5.jpg"
+	buffer 33
+	picload"desktop/Preview/desktop6.jpg"
+	buffer 34
+	picload"desktop/Preview/desktop7.jpg"
+	buffer 35
+	picload"desktop/Preview/desktop8.jpg"
+	buffer 36
+	picload"desktop/Preview/desktop9.jpg"
+	buffer 37
+	picload"desktop/Preview/desktop10.jpg"
+	buffer 38
+	picload"desktop/Preview/desktop11.jpg"
+	buffer 39
+	picload"desktop/Preview/desktop12.jpg"
+	buffer 40
+	picload"desktop/Preview/desktop13.jpg"
+	buffer 41
+	picload"desktop/Preview/desktop14.jpg"
+	buffer 42
+	picload"desktop/Preview/desktop15.jpg"
+	buffer 43
+	picload"desktop/Preview/desktop16.jpg"
+	buffer 44
+	picload"desktop/Preview/desktop17.jpg"
+	buffer 108
+	picload"desktop/Preview/desktop18.jpg"
+	buffer 109
+	picload"desktop/Preview/desktop19.jpg"
+	buffer 110
+	picload"desktop/Preview/desktop20.jpg"
+	buffer 111
+	picload"desktop/Preview/desktop21.jpg"
+	;--------------------------------------------------------------------------------------------------------
+	buffer 45
+	picload"img/button2.png"
+	buffer 46
+	picload"img/button3.png"
+	buffer 47
+	picload"img/button4.png"
+	buffer 48
+	picload"img/button5.png"
+	buffer 49
+	picload"img/button6.png"
+	buffer 50
+	picload"img/button7.png"
+	buffer 51
+	picload"img/button8.png"
+	buffer 52
+	picload"img/button1.png"
+	buffer 53
+	picload"app/tetris/menu.png"
+	buffer 54
+	picload"app/tetris/haikei.jpg"
+	buffer 55
+	picload"ico/filew.png"
+	buffer 56
+	picload"ico/myconw.png"
+	buffer 57
+	picload"ico/ongakuw.png"
+	buffer 58
+	picload"ico/guide.png"
+	///////////ユーザー画像///////////
+	buffer 60
+	picload"img/userphoto1.png"
+	buffer 61
+	picload"img/userphoto2.png"
+	buffer 62
+	picload"img/userphoto3.png"
+	buffer 63
+	picload"img/userphoto4.png"
+	buffer 64
+	picload"img/userphoto5.png"
+	buffer 65
+	picload"img/userphoto6.png"
+	buffer 66
+	picload"img/userphoto7.png"
+	buffer 67
+	picload"img/userphoto8.png"
+	buffer 68
+	picload"img/userphoto9.png"
+	////////////////////////////////////
+	buffer 69
+	picload userphotoload2
+	buffer 71
+	picload"ico/rpg.png"
+	buffer 72
+	picload"img/color.png"
+	buffer 74
+	picload"img/smycom.png"
+	buffer 75
+	picload"img/sapp.png"
+	buffer 76
+	picload"img/smp.png"
+	buffer 77
+	picload"img/sin.png"
+	buffer 78
+	picload"img/sstart2.png"
+	buffer 79
+	picload"img/sstart.png"
+	buffer 81
+	picload"img/myconm.png"
+	buffer 82
+	picload"img/myconmc.png"
+	buffer 83
+	picload"img/myconmd.png"
+	buffer 84
+	picload"img/appm.png"
+	buffer 85
+	picload"img/gamem.png"
+	buffer 86
+	picload"img/fireboxm.png"
+	buffer 87
+	picload"img/tabexplorerm.png"
+	buffer 88
+	picload"img/cpm.png"
+	buffer 89
+	picload"img/mpm.png"
+	buffer 90
+	picload"img/joho.png"
+	buffer 91
+	picload"img/saisin.png"
+	buffer 92
+	picload"img/dlm.png"
+	buffer 93
+	picload"img/guidem.png"
+	buffer 94
+	picload"img/shuryom.png"
+	buffer 95
+	picload"img/mt1.png"
+	buffer 96
+	picload"img/mt2.png"
+	//buffer 99
+	//picload"img/logo.png" ←メインソースで読み込み
+	buffer 106
+	picload"ico/cpicon.png"
+	buffer 107
+	picload"ico/apu.png"
+	buffer 113
+	picload"ico/imemo.png"
+	buffer 115
+	picload"img/sakusha.png"
+	buffer 116
+	picload"desktop/preview/desktop22.jpg"
+	buffer 117
+	picload"desktop/preview/desktop23.jpg"
+	buffer 118
+	picload"desktop/preview/desktop24.jpg"
+	buffer 119
+	picload"desktop/preview/desktop25.jpg"
+	buffer 120
+	picload"desktop/preview/desktop26.jpg"
+	buffer 123
+	picload"img/server.png"
+	buffer 125
+	picload"img/waku_button_40x20.png"
+	buffer 126
+	picload"img/cp_icon1.png"
+	buffer 127
+	picload"img/cp_icon2.png"
+	buffer 128
+	picload"img/cp_icon3.png"
+	buffer 129
+	picload"img/sidebar.png"
+	buffer 130
+	picload"img/error1.png"
+	buffer 131
+	picload"img/error2.png"
+	buffer 132
+	picload"img/error3.png"
+	
+	//スタートメニューのボタン類//
+	buffer 133
+	picload"img/sm_hantoumei.png"
+	buffer 134
+	picload"img/sm_shortcut.png"
+	buffer 135
+	picload"img/sm_size.png"
+	buffer 141
+	picload"img/sm_bug.png"
+	///////////////////////////////
+	
+	//新参アイコンたち//
+	buffer 136
+	picload"ico/krone.png"
+	buffer 137
+	picload"ico/tetris2.png"
+	buffer 138
+	picload"ico/twitter2.png"
+	buffer 139
+	picload"ico/fb2.png"
+	buffer 140
+	picload"ico/dentaku2.png"
+	/////////////////////
+	
+	buffer 142
+	picload"img/krone.png"
+	buffer 143
+	picload"img/help/welcome.png"
+	//Kroneのタブボタン
+	buffer 144
+	picload "img/kronetab.png"
+	buffer 145
+	picload "img/Kronetab2.png"
+	//
+	
+	//ここからcelloadになります
+	celload"img/weather/sunny.png",146
+	celload"img/weather/cloudy.png",147
+	celload"img/weather/rainy.png",148
+	celload"img/weather/snowy.png",149
+	
+	celload"img/weather/sunny→cloudy.png",150
+	celload"img/weather/sunny→rainy.png",151
+	celload"img/weather/sunny→snowy.png",152
+	celload"img/weather/sunny_cloudy.png",153
+	celload"img/weather/sunny_rainy.png",154
+	celload"img/weather/sunny_snowy.png",155
+	
+	celload"img/weather/cloudy→sunny.png",156
+	celload"img/weather/cloudy→rainy.png",157
+	celload"img/weather/cloudy→snowy.png",158
+	celload"img/weather/cloudy_sunny.png",159
+	celload"img/weather/cloudy_rainy.png",160
+	celload"img/weather/cloudy_snowy.png",161
+	
+	celload"img/weather/rainy→sunny.png",162
+	celload"img/weather/rainy→cloudy.png",163
+	celload"img/weather/rainy→snowy.png",164
+	celload"img/weather/rainy_sunny.png",165
+	celload"img/weather/rainy_cloudy.png",166
+	celload"img/weather/rainy_snowy.png",167
+	
+	celload"img/weather/snowy→sunny.png",168
+	celload"img/weather/snowy→cloudy.png",169
+	celload"img/weather/snowy→rainy.png",170
+	celload"img/weather/snowy_sunny.png",171
+	celload"img/weather/snowy_cloudy.png",172
+	celload"img/weather/snowy_rainy.png",173
+	
+	celload"img/weather/haikei_sunny.png",174
+	celload"img/weather/haikei_cloudy.png",175
+	
+	celload"img/button_180.png",176
+	celload"img/logo_black.png",177
+	celload"img/home.png",178
+	
+	gsel 0,1
+	
+	//最終バッファ番号　buffer 178（欠番あり）

@@ -1,0 +1,43 @@
+*home
+	cls
+	mmstop
+	screen 0,430,180
+	title"Ramen timer"
+	mes"Please select the duration of ramen."
+	button"1•ª",*one:mes"Quick1(Meisei)"
+	button"3•ª",*three:mes"Cup Noodle (Nisshin),Donbee-soba(Nisshin),\nMidori-no-tanuki(Toyo),U.F.O(Nisshin),Peyangu(Marca)
+	button"5•ª",*five:mes"Donbee-udon(Nisshin),Akai-kitsune(Toyo)
+	stop
+*one
+	repeat
+	cls
+	mes"Has measured."
+	byou=byou-1
+	if byou<0 :byou=60
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"Stood a minute.":title"Enjoy delicious":stop
+	mes ""+byou+"seconds remaining"
+	title""+byou+"seconds remaining"
+	wait 100
+	loop
+*three
+	repeat
+	cls
+	mes"Has measured."
+	byou=byou-1
+	if byou<0 :byou=180
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"stood 3 minutes.":title"Enjoy delicious":stop
+	mes ""+byou+"seconds remaining"
+	title""+byou+"seconds remaining"
+	wait 100
+	loop
+*five
+	repeat
+	cls
+	mes"Has measured."
+	byou=byou-1
+	if byou<0 :byou=300
+	if byou=0 :cls:mmload"time.mp3":mmplay:mes"stood 5 minutes.":title"Enjoy delicious":stop
+	mes ""+byou+"seconds remaining"
+	title""+byou+"seconds remaining"
+	wait 100
+	loop

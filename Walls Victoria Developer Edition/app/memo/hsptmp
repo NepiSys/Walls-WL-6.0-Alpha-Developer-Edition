@@ -1,0 +1,108 @@
+////////////////////////////////////////////////////
+//インクルード
+#include "user32.as"
+#include "comctl32.as"
+
+////////////////////////////////////////////////////
+//変数
+	dim nmhdr,3
+	dim tc_item,7		//タブ構造体
+	tab_cnt=0			//タブの数
+	dim hedit			//EDITハンドル
+	dim hedits,10
+	sdim filename,260		//ファイル名
+	sdim filedata,260
+	sdim string,260		//テンポラリ
+
+////////////////////////////////////////////////////
+//ウィンドウ作成
+	//初期化
+	InitCommonControls
+
+	//メインウィンドウ
+	screen 0 , 400,800
+	title "タブメモ帳"
+	width 300,300
+	GetWindowLong hwnd, -16
+	SetWindowLong hwnd, -16 ,stat | 0x50000
+	SetWindowPos hwnd, 0, 0, 0, 0, 0, 0x23
+
+	//ボタン
+	pos 0,0 : objsize 100 , 30
+	button gosub "ファイル読込",*openfile
+	pos 100,0
+	button gosub"保存",*hozon
+	//タブ作成
+	CreateWindowExA 0,"SysTabControl32","",0x54000000,0,30,ginfo_winx,25,hwnd,0,hinstance,0
+	htab = stat
+
+	//メッセージ
+	oncmd gosub *WM_SIZE , 0x0005
+	oncmd gosub *WM_NOTIFY , 0x004e
+stop
+
+////////////////////////////////////////////////////
+//タブの追加 TCM_INSERTITEMA(0x1307)
+*add_tab
+	if string="" : return
+	tc_item(0)=0x01
+	tc_item(3)=varptr(string)
+	tc_item(4)=260
+	SendMessageA htab,0x1307,tab_cnt,varptr(tc_item)
+
+	if hedit!=0:ShowWindow hedit,0
+
+	CreateWindowExA 0x200,"EDIT","",0x50300104,0,55,ginfo_winx,ginfo_winy-55,hwnd,0,hinstance,0
+	hedits(tab_cnt)=stat : hedit=hedits(tab_cnt)
+
+	//TCM_SETCURSEL(0x130c)
+	SendMessageA htab,0x130c,tab_cnt,0
+
+	//WM_SETTEXT(0x000c)
+	notesel filedata:noteload filename
+	SendMessageA hedit,0x000c,0,varptr(filedata)
+	tab_cnt++
+return
+
+////////////////////////////////////////////////////
+//
+*WM_NOTIFY
+	dupptr nmhdr,lparam,12
+	if nmhdr(0)!=htab : return
+	if nmhdr(2)= -551{ //TCN_SELCHANGE (-551)
+		if hedit!=0:ShowWindow hedit,0
+		//TCM_GETCURSEL(0x130b)
+		SendMessageA htab,0x130b,0,0
+		hedit=hedits(stat)
+		MoveWindow hedit,0,55,ginfo_winx,ginfo_winy-55,1
+		ShowWindow hedit,5
+	}
+return
+
+////////////////////////////////////////////////////
+//ファイル読込
+*openfile
+	dialog "",16,""
+	if stat=0 : return
+	filename=refstr
+	string=getpath(filename,8)
+	gosub *add_tab
+return
+
+////////////////////////////////////////////////////
+//
+*WM_SIZE
+	MoveWindow htab,0,30,ginfo_winx,25,1
+	MoveWindow hedit,0,55,ginfo_winx,ginfo_winy-55,1
+	MoveWindow objinfo(0,2),0,0,ginfo_winx,
+*hozon
+	dialog "txt", 17, "保存する名前"
+	if stat = 0 : stop
+    fname = refstr
+	exname=getpath(fname,2)		; ファイル名の拡張子を取得
+	if exname="" : fname+=".txt"	
+	notesel txt	
+	notesave fname
+
+	mes "保存しました。"
+	stop

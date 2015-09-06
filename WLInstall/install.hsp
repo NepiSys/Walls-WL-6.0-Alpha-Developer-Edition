@@ -1,0 +1,276 @@
+#include "Walls.as"
+#include "WallAPI.hsp"
+/*
+メインのソースコードを実は15回程度1から作り直しています
+最初はすべて合わせても500行だったのにWallAPIがめんどくなったせいで...
+このソースを描いているとき思考がほぼ停止していたのでソースがカオス
+たぶん使ってない変数が数十個あると思う
+時間があればソース最適化します
+*/
+
+*bios
+	title "Walls StartUpSystem"
+	screen 0,1024,576
+	gosub *loadimg
+	if(ConfigGetBool("data/Registry.Wallreg","Install")!=0){
+		gosub *SetUp
+	}
+	
+
+stop
+
+*SetUp
+if(ConfigGetBool("data/Registry.Wallreg","FastBoot")!=0){
+		redraw 0
+		color:boxf:color 255,255,255
+		redraw 1
+		i=0
+		repeat 100
+		redraw 0
+		if(cnt<64){
+			pos cnt*16,0
+			mes "."
+		}else{
+			pos i*16,16
+			mes "."
+			i++
+		}
+		redraw 1
+		await 5
+		loop
+}
+	title "Walls のインストール"
+	redraw 0
+    color 0,128,255:boxf
+	redraw 1
+	buffer 1
+	font "",36
+	mes OSName+" "+OSID+" "+Version+"へようこそ!"
+	mx=ginfo_mesx
+	my=ginfo_mesy
+	gsel 0,1
+	pos (ginfo_winx-mx)/2,(ginfo_winy-my)/2
+	color 255,255,255
+	font "",36
+	mes OSName+" "+OSID+" "+Version+"へようこそ!"
+	wait 80
+	repeat 250
+	redraw 0
+	color 0,128,255:boxf
+	pos (ginfo_winx-mx)/2,(ginfo_winy-my)/2-cnt
+	institlex=(ginfo_winy-my)/2-cnt
+	color 255,255,255
+	font "",36
+	mes OSName+" "+OSID+" "+Version+"へようこそ!"
+	redraw 1
+	await
+	loop
+	pos (ginfo_winx-180)/2,(ginfo_winy-90)/2
+	objimage 66,0,0,0,180,0,90
+	objsize 180,90
+	button"",*StartInstall
+return
+
+*StartInstall
+	clrobj 0,-1
+	// RooatCir 全体のサイズ ,球のサイズ,表示X,表示Y,球の数,回数
+	//color 0,128,255
+	//RoatCir 30,2,980/2,540,6
+	newid1=ginfo_newid
+	onexit *InstallExit
+	Screen newid1,1024,576,,-1,-1: bgscrHWnd = hwnd//動画再生用のウィンドウを作成
+	//width -100000,100000,-700000,-7000000
+	mref mr,67			//ウィンドウハンドル取得
+	SetWindowLong hwnd, -8 /* = GWL_HWNDPARENT */, mainHwnd
+	ShowWindow hwnd, 5 /* = SW_NORMAL */
+	fname="img/welcome.wmv"		//ファイル名を代入
+	GetWindowLongA hwnd , -20 
+	SetWindowLongA hwnd , -20 , stat | 0x00080000
+	SetLayered hwnd , 0 , 0*255/100 , 2
+	mci "open \""+fname+"\" alias f"
+	if stat=-1 : dialog "Open err":end		//オープンエラー
+	mci "window f handle "+mr.13			//ウィンドウハンドルをMCIに送信
+	mci "put f destination at "+x+" "+y+" "+ax+" "+ay	//ウィンドウに貼り付け
+	mci "play f"
+ginfo_newid2=ginfo_newid
+buffer ginfo_newid2,1280,720 : bufferHDc = hdc// 動画の画面を取得するためのバッファ
+gsel ginfo_newid2,-1
+dim active,10000
+dim th,10000
+defr=ginfo_r
+defg=ginfo_g
+defb=ginfo_b
+ncount=0
+ RoatSize =30
+ RoatCirSize=2
+ RoatX=1000
+ RoatY=100
+ RoatCirCount = 5
+ RoatCount =1
+r1=15.0
+r2=2
+x0=(1024-RoatSize)/2
+y0=470
+dim active,100
+dim th,100
+ncount=0
+repeat
+redraw 0
+gsel ginfo_newid2 : PrintWindow bgscrHWnd, hdc, 1// Screen 1の内容をbufferに描画する。
+gsel 0,1
+pos 0,0
+color 0,128,255:boxf
+gcopy ginfo_newid2, 0, 0, 1024, 500// bufferの内容をscreenにcopyする
+font "",36
+color 255,255,255
+pos (ginfo_winx-mx)/2,institlex
+if ncount<100{
+if cnt2/20 <=6 : active(cnt2/20)=1
+live=0
+repeat 6
+if active(cnt)=0 : continue
+live=live+1 ; 丸を描いた回数をカウントする
+if th(cnt)<700 {
+c=cos(deg2rad(th(cnt)))
+y=r1*c+y0
+x=-r1*sin( deg2rad(th(cnt)) )+x0
+color 100,160,250
+circle x-r2,y-r2,x+r2,y+r2,1
+th(cnt)=th(cnt)+(c+2)*(c+2)
+} else {
+active(cnt)=0
+th(cnt)=0
+}
+loop
+if live=0 : ncount=ncount+1 ;丸が全部消えてからのループ回数=時間をカウント
+cnt2++
+} else {
+;次の回を開始
+cnt2=0
+ncount=0
+
+
+}
+if(cnt==200){
+shokiname="Walls User"
+oncmd gosub *ctlcoloredit, $133
+pos 355,520
+winobj "edit",shokiname,WS_EX_CLIENTEDGE,WS_CHILD|WS_VISIBLE,300,20,0
+dim stats
+stats.0=stat
+objsel stat
+hInput = objinfo(stat, 2)
+GetWindowLongA hInput , -16
+SetWindowLongA hInput , -16, stat | $1
+CreateSolidBrush RGB($00, $80, $FF)
+hBrush.0 = stat
+objsize 50,20
+objimage 39
+pos 355+300+16,520
+button gosub "",*UserSettingPass
+stats.1=stat
+}
+
+if(UserSettingPassFlag==1){
+	UserSettingPassF=0
+	UserSettingPassFlag=0
+	MoveObject stats,10,0,0,1
+	clrobj 0,-1
+
+UserSettingPassFF=1
+oncmd gosub *ctlcoloredit, $133
+pos 355,520-5
+shokipass=""
+winobj "edit",shokipass,WS_EX_CLIENTEDGE,WS_CHILD|WS_VISIBLE|ES_PASSWORD,300,30,0
+stats.0=stat
+objsel stat
+hInput = objinfo(stat, 2)
+GetWindowLongA hInput , -16
+SetWindowLongA hInput , -16, stat | $1
+CreateSolidBrush RGB($00, $80, $FF)
+hBrush.0 = stat
+objsize 50,20
+objimage 39
+pos 355+300+16,520
+button gosub "",*Installing
+stats.1=stat
+}
+
+
+if(InstallFlag==1){
+	InstallFlag=0
+	InstallFF=1
+	MoveObject stats,10,0,0,1
+	clrobj 0,-1
+	UserSettingPassFF=0
+}
+color 255,255,255
+if(cnt<200){
+mes OSName+" "+OSID+" "+Version+"へようこそ!"
+}if(cnt>200 &&UserSettingPassFF!=1 && InstallFF!=1&&CompFF!=1 ){
+	font "",36
+	pos (ginfo_winx-mx*2+28)/2,institlex
+	mes "設定したいユーザー名を入力してください"
+	font "",26
+	pos x0-6,y0-13
+	mes "3"
+}
+if(UserSettingPassFF==1){
+	pos (ginfo_winx-mx*2+28)/2,institlex
+	color 200,200,100
+	font "",36
+	mes "設定したいパスワードを入力してください"
+	font "",26
+	pos x0-6,y0-13
+	mes "2"
+}
+if(InstallFF==1){
+	pos (ginfo_winx-mx*2+28)/2,institlex
+	color 200,100,100
+	font "",36
+	mes "Wallsのインストール準備を行っています"
+	font "",26
+	pos x0-6,y0-13
+	mes "1"
+}
+redraw 1
+await
+loop
+stop
+
+
+
+
+*loadimg
+notesel pics
+dirlist pics,"img/*.png",1
+repeat notemax 
+noteget pi,cnt
+celload "img/"+pi,cnt+1
+loop
+return
+*ctlcoloredit
+;	lparamにオブジェクトのウィンドウハンドルが返る
+	if hInput = lparam {
+		SetTextColor wparam, RGB($FF, $FF, $FF)
+
+;		テキスト背景色 (hBrush.0と同色を指定)
+		SetBkColor wparam, RGB($00, $80, $FF)
+
+;		ボックス背景色
+		return hBrush
+	}
+
+	return
+
+*UserSettingPass
+objsel 1
+	UserSettingPassFlag=1
+	return
+*installing
+	objsel 1
+	InstallFlag=1
+	return
+*InstallExit
+	mci "close f"
+	end

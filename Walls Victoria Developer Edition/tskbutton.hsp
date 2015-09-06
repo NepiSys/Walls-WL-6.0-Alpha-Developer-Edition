@@ -1,0 +1,22 @@
+	if ic>0:pos icx,546:gmode 2:gcopy 4,0,0,30,30;もしもicが1以上になっていたらicx(位置の変数),546に「マイコンピュータ」ボタンを表示する
+	if ia>0:pos iax,546:gmode 2:gcopy 2,0,0,30,30
+	if icont>0:pos icontx,546:gmode 2:gcopy 106,0,0,30,30
+	if im>0:pos imx,546:gmode 2:gcopy 16,0,0,30,30
+	if ig>0:pos igx,546:gmode 2:gcopy 2,0,0,30,30
+	if igu>0:pos igux,546:gmode 2:gcopy 58,0,0,30,30
+	if imemo>0:pos imemox,546:gmode 2:gcopy 113,0,0,30,30
+	
+	onclick gosub*sm_click
+	
+	gmode 0//gmodeをリセット
+	
+	pos 1014,546
+	objimage 25, 0,0, 0,827, 0,455:objsize 10,30
+	button"",*jiho
+	;apu
+	pos 545,546:gcopy 107,0,0,30,30
+	objimage 25, 0,0, 0,827, 0,455
+	objsize 250,20
+	pos 585,550:input apus
+	objsize 50,20
+	pos 850,550:button"OK",*chk

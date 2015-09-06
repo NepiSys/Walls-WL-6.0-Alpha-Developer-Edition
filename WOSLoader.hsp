@@ -1,0 +1,25 @@
+#include "WallAPI.hsp"
+#uselib "User32.dll"
+screen 0,1024,576
+title "WOSLoader"
+notesel WOSList
+dirlist WOSList,"disks/*.wos",0
+redraw 0
+boxf:color 255,255,255
+mes "CurrentOSVersion = NT "+GetCurrentOSVer()
+mes "CPUName ="+GetCPUName()
+mes "Get WOSFiles"
+color 255,255,0
+mes "\n"+WOSList
+redraw 1
+/*
+if(ConfigGetBool("WOSLoaderReg/WOSLoader.wallreg","FirstBoot") == 1){
+	
+}
+if(ConfigGetBool("WOSLoaderReg/WOSLoader.wallreg","FirstBoot") == -1){
+	color 255,0,0
+	mes "WOSLoader Registry File Not Found"
+	mes "CreateRegistry ....."
+	ConfigSetBool "WOSLoaderReg/WOSLoader.wallreg" ,"FirstBoot","false"
+}
+*/

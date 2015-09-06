@@ -1,0 +1,105 @@
+	value=instr(apus, , "アプリ")
+	if value=0:goto*app
+
+	value=instr(apus, , "マイコン")
+	if value=0:goto*mycon
+
+	value=instr(apus, , "apu")
+	if value=0:dialog"はい、なんでしょう？":stop
+
+	value=instr(apus, , "cドライブ")
+	if value=0:goto*c
+
+	value=instr(apus, , "Cドライブ")
+	if value=0:goto*c
+
+	value=instr(apus, , "dドライブ")
+	if value=0:goto*d
+
+	value=instr(apus, , "Dドライブ")
+	if value=0:goto*d
+	
+	value=instr(apus, , "アプリ")
+	if value=0:goto*app
+	
+	value=instr(apus, , "ゲーム")
+	if value=0:goto*game
+	
+	value=instr(apus, , "コントロールパネル")
+	if value=0:goto*cp
+	
+	value=instr(apus, , "コンパネ")
+	if value=0:goto*cp
+	
+	value=instr(apus, , "壁紙")
+	if value=0:goto*haikeihenko
+	
+	value=instr(apus, , "背景")
+	if value=0:goto*haikeihenko
+	
+	value=instr(apus, , "ネット")
+	if value=0:goto*net
+	
+	value=instr(apus, , "rone")
+	if value=0:goto*net
+	
+	value=instr(apus, , "検索")
+	if value=0:goto*net
+	
+	value=instr(apus, , "テトリス")
+	if value=0:goto*tetris
+	
+	value=instr(apus, , "Music")
+	if value=0:goto*MP
+	
+	value=instr(apus, , "MP")
+	if value=0:goto*MP
+	
+	value=instr(apus, , "初期化")
+	if value=0:goto*reset
+	
+	value=instr(apus, , "リカバリ")
+	if value=0:goto*reset
+	
+	value=instr(apus, , "情報")
+	if value=0:goto*info
+	
+	value=instr(apus, , "witter")
+	if value=0:goto*twitter
+	
+	value=instr(apus, , "acebook")
+	if value=0:goto*FB
+	
+	value=instr(apus, , "再起動")
+	if value=0:goto*restarting
+	
+	value=instr(apus, , "シャットダウン")
+	if value=0:goto*shutdown
+	
+	value=instr(apus, , "ログオフ")
+	if value=0:goto*logoff
+	
+	value=instr(apus, , "メニュー")
+	if value=0:goto*menu
+	
+	value=instr(apus, , "更新")
+	if value=0:goto*update
+	
+	value=instr(apus, , "アップデート")
+	if value=0:goto*update
+	
+	color 0,128,255:objimage 25, 0,0, 0,827, 0,455:objsize 100,20:font "",18
+	if apus="好き":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"私はあくまでもWallsの機能のひとつです。\nたとえあなたが私を好きになったとしても、交際することはできませんよ":clock
+	if apus="アホ":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"その言葉、鏡の前に立って自分で言ってみてください。":clock
+	if apus="バカ":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"それは自分に言ってるんでしょう？":clock
+	if apus="馬鹿":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"私は馬鹿ですので言ってる意味がわかりません":clock
+	if apus="死ね":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"それをこの世の中で言ってはいけない\nということぐらいあなたも知ってるでしょう？":clock
+	if apus="役立たず":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"苦情ならYotioSoftに言ってくださいよ":pos 800,510:button"不具合のご報告",*error_houkoku:clock
+	if apus="かわいい":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"お世辞でもうれしいです。":clock
+	if apus="ありがとう":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"どういたしまして。":clock
+	if apus="頭悪い":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"私はあくまでもWallsの機能のひとつです。\n私には頭などありません。":clock
+	if apus="頭いい":boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"お世辞でもうれしいです。":clock
+	if apus="ah":mmload"music/ah.mp3":mmplay:clock
+	
+	boxf 400,500,1024,545:pos 410,505:color 255,255,255:mes"申し訳ございません。\n私には意味がわかりませんでした"
+	stop

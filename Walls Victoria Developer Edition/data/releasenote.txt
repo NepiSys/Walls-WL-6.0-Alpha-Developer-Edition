@@ -1,0 +1,5 @@
+リリースノート（Walls Waterloo SP2以降）
+
+Walls Waterloo SP2（Build 5002）
+・リリースノートを追加
+・バグを修正、若干動作の改善？

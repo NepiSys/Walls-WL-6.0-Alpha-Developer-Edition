@@ -1,0 +1,61 @@
+
+#include "user32.as"
+GetClassLong hwnd, -26
+SetClassLong hwnd, -26, stat | $8
+oncmd gosub *dc, $203	;ondoubleclick
+
+dim b,2
+b = 9, 654
+
+dim w,32 * 24
+foreach b
+	w(b(cnt)) = cnt+1
+loop
+
+ldim bl,length(b)
+lb = *b1,*b2
+
+repeat -1
+	p = 32*(mouseY/20)+(mouseX/20)
+	getkey c ,1
+
+	if d = 0 & c {
+		if w(p) {	n = w(p)-1 : d++}
+	}
+	if c = 0 : d = 0
+
+	if d {
+		if 0 < w(p) & w(p) ! (n+1) : p++
+		b(n) = p
+		w(p) = n+1
+	}
+
+	color 255,255,255 : boxf
+
+	foreach b
+		color 0,120*cnt,0
+		if d & n = cnt { boxf mouseX-9,mouseY-9,mouseX+9,mouseY+9 } else { boxf 20*(b(cnt)\32)+1,20*(b(cnt)/32)+1,20*(b(cnt)\32)+18,20*(b(cnt)/32)+18}
+	loop
+
+	redraw 1
+	redraw 2
+	await 20
+loop
+
+*dc
+	p = 32*(mouseY/20)+(mouseX/20)
+	n = -1
+	foreach b
+		if b(cnt) = p { n = cnt : break}
+	loop
+
+	if 0 <= n : gosub lb(n)
+return
+
+*b1
+	dialog "ボタン1が押されました"
+return
+
+*b2
+	dialog "ボタン2が押されました"
+return

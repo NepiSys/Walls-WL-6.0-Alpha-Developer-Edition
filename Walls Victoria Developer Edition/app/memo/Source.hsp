@@ -1,0 +1,107 @@
+*notepad
+	#uselib "user32.dll"
+	
+	#func GetWindowLongA "GetWindowLongA" int , int 
+	#func SetWindowLongA "SetWindowLongA" int , int , int 
+	#func SetLayered "SetLayeredWindowAttributes" int , int , int , int 
+	GetWindowLongA hwnd , -20 
+	SetWindowLongA hwnd , -20 , stat | 0x00080000
+
+	SetLayered hwnd , 0 , 0*255/100 , 2
+	bgscr 10,570,400
+	title "メモ帳" 
+	onclick gosub *move 
+	buffer 9
+	value_color = $FF, $FF, $FF
+	gosub *draw
+	gsel 10
+	onclick gosub *move 
+	mx=5 : my=30 : px=3 : py=3 
+	pos 5,29
+	sdim txt, 0
+	notesel buf
+	mesbox txt, 560, 350
+	objmode 2
+	objsize 100,20
+	pos 150,5
+	button "保存...", *save
+	pos 250,5
+	button "クリア", *clear
+	pos 350,5
+	button "Load",*Load
+	objimage 9, 0, 0, 0, 30, 0, 60
+	objsize 40,20 
+	pos 525,1 :button "",*check 
+*main 
+redraw 0 
+color 0,0,0 : boxf 0,0,570,400
+color 195,195,195 : boxf 1,1,568,398 
+color 0,0,0 : pos 5,5 : mes "メモ帳"
+pos 5,30
+mes ""
+onexit *check
+redraw 
+await 15 
+goto *main 
+*move 
+if ginfo_act ! 10 : return
+if wparam=1 : sendmsg hwnd,$00A1,2,0 
+return
+*owari 
+end
+*draw
+color 255,0,0
+boxf 0, 0, 100, 30
+color 150,50,50
+boxf 0, 30, 100, 60
+color 255,50,50
+boxf 0, 60, 100, 90
+color value_color.0, value_color.1, value_color.2
+pos 12, 3
+mes "×"
+pos 12, 33
+mes "×"
+pos 12, 63
+mes "×"
+return
+*clear	
+dialog "終了します。よろしいですか？" ,3, "Garry050 OS"
+if stat = 6 {
+objprm 0, ""
+stop
+}
+if stat = 7 {
+	stop
+}
+
+*save
+	dialog "txt", 17, "保存する名前"
+	if stat = 0 : stop
+    fname = refstr
+	exname=getpath(fname,2)		; ファイル名の拡張子を取得
+	if exname="" : fname+=".txt"	
+	notesel txt	
+	notesave fname
+
+	mes "保存しました。"
+	stop
+*Load
+	dialog "",16,""
+if stat = 0 {
+	stop
+}
+if stat = 1 {
+notesel txt
+noteload refstr
+objprm 0, txt
+}
+stop
+*check
+dialog "終了します。よろしいですか？" ,3, "Garry050 OS"
+if stat = 6 {
+objprm 0, ""
+end
+}
+if stat = 7 {
+	stop
+}

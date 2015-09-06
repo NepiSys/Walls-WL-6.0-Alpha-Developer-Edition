@@ -1,0 +1,174 @@
+
+/*━━━━━━━━━━
+	画面初期化
+──────────*/
+//----変数初期化
+zmod=0	;(0=待機中,1=実行中,2=一時停止,3=完全停止)
+
+//----画面初期化
+screen 0,140,120	;画面初期化
+syscolor 15	:boxf
+color 210,210,210	:boxf 0,100,140,120
+objsize 140,40	;オブジェクトサイズ指定
+pos 0,0	:button gosub"暗号化",*ango	:ID_ango=stat
+pos 0,40	:button gosub"復号化",*hkgo	:ID_hkgo=stat
+color	:font "",12	:pos 3,83	:mes "暗号コード(0～255)"
+key=rnd(255)	:pos 110,80	:input key,30,20,3	:ID_key=stat	;キーインプットボックス設置
+color	:font "",12	:pos 3,103	:mes "待機中"
+stop
+
+/*━━━━━━━━━━
+	暗号化
+──────────*/
+*ango
+//----システム処理
+if zmod=1{	;一時停止ボタンが押された場合
+	zmod=2	;モードを変更
+	objprm ID_ango,"再開"	;再開ボタンに変更
+	return	;戻る
+}
+if zmod=2{	;一時停止ボタンが押された場合
+	zmod=1	;モードを変更
+	objprm ID_ango,"一時停止"	;一時停止ボタンに変更
+	return	;戻る
+}
+
+//----読み込みファイルの選択
+dialog "",16,"暗号化するファイル"	;ファイルの選択
+if stat=0	:return
+loadname=refstr
+exist loadname	:size=strsize	;ファイルサイズの確認
+if size=-1	:dialog "ファイル読み込みエラー",1,"エラー"	:return
+
+//----保存先ファイルの選択
+dialog "",17,"暗号化するファイル"	;ファイルの選択
+if stat=0	:return
+savename=refstr
+
+//----画面の変更
+zmod=1	;実行モードを変更
+objprm ID_ango,"一時停止"	;暗号ボタンを一時停止ボタンに変更
+objprm ID_hkgo,"完全停止"	;暗号ボタンを停止ボタンに変更
+objenable ID_key,0	;キーの変更を無効化
+
+//----暗号化
+maxsize=32000	;一回に保存するデーターの最大サイズ
+sdim data,maxsize
+
+//----ファイル暗号化処理
+repeat size/maxsize+1
+	bload loadname,data,maxsize,cnt*maxsize	;一部のみ読み込み
+	lop=limit(size-maxsize*cnt,0,maxsize)	;ループ数
+	repeat lop
+		poke data,cnt,peek(data,cnt)+key	;暗号化
+	loop
+	
+	if cnt{
+		bsave savename,data,lop,cnt*maxsize
+	}else{	;始めは新規作成
+		bsave savename,data,lop
+	}
+	await 1	;一定時間待つ
+	redraw 0
+	color 210,210,210	:boxf 0,100,140,120
+	a=100.0/(size/maxsize+1)*cnt
+	color	:font "",12	:pos 3,103	:mes "暗号化実行中："+strf("%.1f",a)+"%終了"
+	redraw 1
+
+	if zmod=2{
+		redraw 0
+		color 210,210,210	:boxf 0,100,140,120
+		a=100.0/(size/maxsize+1)*cnt
+		color	:font "",12	:pos 3,103	:mes "暗号化一時停止中："+strf("%.1f",a)+"%終了"
+		redraw 1
+		do	:await 100	:until zmod=1 | zmod=3	;一時停止が解除されたら実効再開。もしくは完全停止が押された場合
+	}
+	if zmod=3	:break	;強制的に停止
+loop
+
+color 210,210,210	:boxf 0,100,140,120
+color	:font "",12	:pos 3,103	:mes "待機中"
+objprm ID_ango,"暗号化"	;ボタンを戻す
+objprm ID_hkgo,"復号化"	;ボタンを戻す
+objenable ID_key,1	;キーの変更を有効化
+if zmod=1	:dialog "処理が完了しました。",,"完了"
+if zmod=3	:dialog "ユーザーにより処理が停止されました。\n作成したファイルを削除しますか？",3,"完了"	:if stat=6{delete savename}
+zmod=0	;実行モードの変更
+return	;終了
+
+/*━━━━━━━━━━
+	復号化
+─────────*/
+*hkgo
+//----システム処理
+if zmod!=0{	;一時停止ボタンが押された場合
+	dialog "本当に実行を停止しますか？",3,"警告"
+	if stat=6{
+		zmod=3	;モードを変更
+		objprm ID_ango,"再開"	;再開ボタンに変更
+	}
+	return	;戻る
+}
+
+//----読み込みファイルの選択
+dialog "",16,"復号化するファイル"	;ファイルの選択
+if stat=0	:return
+loadname=refstr
+exist loadname	:size=strsize	;ファイルサイズの確認
+if size=-1	:dialog "ファイル読み込みエラー",1,"エラー"	:return
+
+//----保存先ファイルの選択
+dialog "",17,"復号化するファイル"	;ファイルの選択
+if stat=0	:return
+savename=refstr
+
+//----画面の変更
+zmod=1	;実行モードを変更
+objprm ID_ango,"一時停止"	;暗号ボタンを一時停止ボタンに変更
+objprm ID_hkgo,"完全停止"	;暗号ボタンを停止ボタンに変更
+objenable ID_key,0	;キーの変更を無効化
+
+//----暗号化
+maxsize=32000	;一回に保存するデーターの最大サイズ
+sdim data,maxsize
+
+//----ファイル復号化処理
+repeat size/maxsize+1
+	bload loadname,data,maxsize,cnt*maxsize	;一部のみ読み込み
+	lop=limit(size-maxsize*cnt,0,maxsize)	;ループ数
+	repeat lop
+		poke data,cnt,peek(data,cnt)-key	;復号化
+	loop
+	
+	if cnt{
+		bsave savename,data,lop,cnt*maxsize
+	}else{	;始めは新規作成
+		bsave savename,data,lop
+	}
+	await 1	;一定時間待つ
+	redraw 0
+	color 210,210,210	:boxf 0,100,140,120
+	a=100.0/(size/maxsize+1)*cnt
+	color	:font "",12	:pos 3,103	:mes "復号化実行中："+strf("%.1f",a)+"%終了"
+	redraw 1
+
+	if zmod=2{
+		redraw 0
+		color 210,210,210	:boxf 0,100,140,120
+		a=100.0/(size/maxsize+1)*cnt
+		color	:font "",12	:pos 3,103	:mes "復号化一時停止中："+strf("%.1f",a)+"%終了"
+		redraw 1
+		do	:await 100	:until zmod=1 | zmod=3	;一時停止が解除されたら実効再開。もしくは完全停止が押された場合
+	}
+
+loop
+
+color 210,210,210	:boxf 0,100,140,120
+color	:font "",12	:pos 3,103	:mes "待機中"
+objprm ID_ango,"暗号化"	;ボタンを戻す
+objprm ID_hkgo,"復号化"	;ボタンを戻す
+objenable ID_key,1	;キーの変更を有効化
+if zmod=1	:dialog "処理が完了しました。",,"完了"
+if zmod=3	:dialog "ユーザーにより処理が停止されました。\n作成したファイルを削除しますか？",3,"完了"	:if stat=6{delete savename}
+zmod=0	;実行モードの変更
+return	;終了

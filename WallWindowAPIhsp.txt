@@ -1,0 +1,23 @@
+#module WallWindowAPI
+//addWindow タイトル,タイトルの部分の大きさ,ウインドウサイズX,ウインドウサイズY,ウインドウ表示場所X,ウインドウ表示場所Y,ウインドウID(=BufferID）
+//べっ別にいちいちwidthとかtitleとか作るのが大変だったから パラメータが多くなったわけじゃないんだからね!!
+#deffunc addWindow str WinTitle,int TitY,int WinSX,int WinSY,int WinPX,int WinPY,int WinID
+buffer WinID,WinSX+1,WinSY+1
+color 255,100,0
+boxf 0,0,WinSX,TitY
+line 0,WinSY,0,0
+line WinSX,TitY,WinSX,WinSY
+line WinSX,WinSY,0,WinSY
+pos 0,TitY/2-8
+color 255,255,255
+mes WinTitle
+winposx@.WinID=WinPX
+winposy@.WinID=WinPY
+winsizex@.WinID=WinSX
+winsizey@.WinID=WinSY
+wintilesizey@.WinID=TitY
+win@.length(win@)=WinID
+gsel 0,1
+return
+#global
+

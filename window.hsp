@@ -1,0 +1,82 @@
+
+
+//マルチウインドウテスト
+//参考サイト等: 今のところなし
+#module WallWindowAPI
+//addWindow タイトル,タイトルの部分の大きさ,ウインドウサイズX,ウインドウサイズY,ウインドウ表示場所X,ウインドウ表示場所Y,ウインドウID(=BufferID）
+//べっ別にいちいちwidthとかtitleとか作るのが大変だったから パラメータが多くなったわけじゃないんだからね!!
+#deffunc addWindow str WinTitle,int TitY,int WinSX,int WinSY,int WinPX,int WinPY,int WinID
+buffer WinID,WinSX+1,WinSY+1
+color 255,100,0
+boxf 0,0,WinSX,TitY
+line 0,WinSY,0,0
+line WinSX,TitY,WinSX,WinSY
+line WinSX,WinSY,0,WinSY
+pos 0,TitY/2-8
+color 255,255,255
+mes WinTitle
+winposx@.length(winposx@)=WinPX
+winposy@.length(winposy@)=WinPY
+winsizex@.length(winsizex@)=WinSX
+winsizey@.length(winsizey@)=WinSY
+wintilesizey@.length(wintilesizey@)=TitY
+win@.length(win@)=WinID
+gsel 0,1
+return
+#global
+
+
+
+//ここを増やしたりするといろいろできるお
+
+addWindow "あいう",60,100,400,60,70,2
+addWindow "あいう",30,200,200,90,100,6
+
+
+oncmd gosub *LMButtonDown ,0x0202
+repeat
+redraw 0
+color 255,255,255:boxf:color
+
+	getkey winclick,1
+	repeat length(win)
+		winmx=mousex
+		winmy=mousey
+		if(winmx > winposx.cnt && winmx < winposx.cnt+winsizex.cnt && winmy > winposy.cnt && winmy < winposy.cnt+wintilesizey.cnt && bc==0){
+			if(winclick==1){
+				activewindow=cnt
+				bc=1
+			}else{
+				bc=0
+			}
+		}
+		
+		if(bc==1 && bco==0){
+			winposxx.activewindow=mousex-winposx.activewindow
+			winposyy.activewindow=mousey-winposy.activewindow
+		}
+		if(bc==1){
+			winposx.activewindow=mousex-winposxx.activewindow
+			winposy.activewindow=mousey-winposyy.activewindow
+		}
+	loop
+
+		repeat length(win)
+			if(cnt==activewindow){
+				continue
+			}
+			pos winposx.cnt,winposy.cnt
+			gcopy win.cnt,0,0,winsizex.cnt+1,winsizey.cnt+1
+		loop
+
+		pos winposx.activewindow,winposy.activewindow
+		gcopy win(activewindow),0,0,winsizex.activewindow+1,winsizey.activewindow+1
+		
+bco=bc
+redraw 1
+await
+loop
+
+*LMButtonDown
+	bc=0
+	return

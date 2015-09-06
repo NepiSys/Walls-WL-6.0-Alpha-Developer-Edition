@@ -1,0 +1,6 @@
+#uselib "User32.dll"
+#func SetWindowCompositionAttribute "SetWindowCompositionAttribute" int, var
+setting=3/*,3,444444444*/ //←標準で色指定したい場合はコメントアウトを外す
+WCAData = 19,varptr(setting),16
+SetWindowCompositionAttribute hwnd, WCAData
+color 0,0,0:boxf //黒でAeroになる(cls 4）

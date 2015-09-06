@@ -1,0 +1,89 @@
+#uselib "user32.dll"
+#func PrintWindow "PrintWindow" int, int, int
+#func SetWindowLong "SetWindowLongA" int, int, int
+#func ShowWindow "ShowWindow" int, int
+#func GetWindowLongA "GetWindowLongA" int , int 
+#func SetWindowLongA "SetWindowLongA" int , int , int 
+#func SetLayered "SetLayeredWindowAttributes" int , int , int , int 
+#include "../WallAPI.hsp"
+	Screen 1,1024,576: bgscrHWnd = hwnd//動画再生用のウィンドウを作成
+
+	mref mr,67			//ウィンドウハンドル取得
+	SetWindowLong hwnd, -8 /* = GWL_HWNDPARENT */, mainHwnd
+	ShowWindow hwnd, 5 /* = SW_NORMAL */
+	fname="../img/welcome.wmv"		//ファイル名を代入
+	mci "open \""+fname+"\" alias f"
+	if stat=-1 : dialog "Open err":end		//オープンエラー
+	mci "window f handle "+mr.13			//ウィンドウハンドルをMCIに送信
+	mci "put f destination at "+x+" "+y+" "+ax+" "+ay	//ウィンドウに貼り付け
+	mci "play f"
+	GetWindowLongA hwnd , -20 
+	SetWindowLongA hwnd , -20 , stat | 0x00080000
+	SetLayered hwnd , 0 , 0*255/100 , 2
+
+buffer 2,1280,720 : bufferHDc = hdc// 動画の画面を取得するためのバッファ
+gsel 2,-1
+
+dim active,10000
+dim th,10000
+defr=ginfo_r
+defg=ginfo_g
+defb=ginfo_b
+ncount=0
+ RoatSize =30
+ RoatCirSize=2
+ RoatX=1000
+ RoatY=100
+ RoatCirCount = 5
+ RoatCount =1
+Screen 0,1024,576//メインウィンドウ
+r1=15.0
+r2=2
+x0=(1024-RoatSize)/2
+y0=470
+dim active,100
+dim th,100
+ncount=0
+
+repeat
+
+redraw 0
+gsel 2 : PrintWindow bgscrHWnd, hdc, 1// Screen 1の内容をbufferに描画する。
+
+gsel 0,1
+pos 0,0
+color 0,128,255:boxf
+gcopy 2, 0, 0, 1024, 500// bufferの内容をscreenにcopyする
+
+if ncount<100{
+if cnt2/20 <=6 : active(cnt2/20)=1
+live=0
+repeat 6
+if active(cnt)=0 : continue
+live=live+1 ; 丸を描いた回数をカウントする
+if th(cnt)<700 {
+c=cos(deg2rad(th(cnt)))
+y=r1*c+y0
+x=-r1*sin( deg2rad(th(cnt)) )+x0
+color 150,160,250
+circle x-r2,y-r2,x+r2,y+r2,1
+th(cnt)=th(cnt)+(c+2)*(c+2)
+} else {
+active(cnt)=0
+th(cnt)=0
+}
+loop
+
+if live=0 : ncount=ncount+1 ;丸が全部消えてからのループ回数=時間をカウント
+cnt2++
+} else {
+;次の回を開始
+cnt2=0
+ncount=0
+}
+
+
+	
+redraw 1
+await
+loop

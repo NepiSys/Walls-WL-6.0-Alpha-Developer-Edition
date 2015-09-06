@@ -1,0 +1,52 @@
+#uselib "user32.dll"
+#func SetParent "SetParent" int,int
+
+screen 0,640,480 : Phwnd(0) = hwnd
+boxf
+bgscr 1,270,200 : Phwnd(1) = hwnd
+buffer 100
+font "MS UI Gothic", 16, 1
+value_color = $FF, $FF, $FF
+gosub *draw
+gsel 1
+objimage 100, 0, 0, 0, 30, 0, 60
+objsize 40,20 
+pos 225,0 :button "",*owari
+color 0,150,255 : boxf 0,0,270,200 
+color 255,255,255 : boxf 5,30,264,194 
+color 0,0,0 : pos 5,5 : mes "Å@Windows8ïó"
+pos 5,30
+mes ""
+onclick gosub *move 
+
+SetParent Phwnd(1),Phwnd(0)
+onclick gosub *move 
+stop
+
+*move
+	if ginfo_act == 1 and wparam == 1 : sendmsg hwnd,$00A1,2,0 
+return 
+
+*draw
+color 255,0,0
+boxf 0, 0, 100, 30
+color 255,80,80
+boxf 0, 30, 100, 60
+color 255,50,50
+boxf 0, 60, 100, 90
+color value_color.0, value_color.1, value_color.2
+pos 12, 3
+mes "Å~"
+pos 12, 33
+mes "Å~"
+pos 12, 63
+mes "Å~"
+return
+
+*owari
+	switch ginfo_act
+	case 0
+		end
+	default
+		gsel ginfo_act,-1
+	swend

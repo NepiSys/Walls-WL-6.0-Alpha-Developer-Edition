@@ -1,0 +1,19 @@
+#include "mod_rss.as"
+// RSSのURL
+url="http://rssc.dokoda.jp/r/4da3fbb8c8581458c2cb788da295dbeb/http/www2.hp-ez.com/hp/ytanifreesoft/newversion"
+// RSSのロード
+rssload desc,link,url,6
+if stat=1 : dialog "取得に失敗しました。" : end
+if stat=2 : dialog "RSSではありません。" : end
+// 表示
+objsize 640,24
+foreach desc
+hyoji=desc(cnt)
+if hyoji="こちら":hyoji=""
+if hyoji="YotioSoft Wallsの最新版は：Walls 3.1のフィードを編集する":hyoji=""
+mes hyoji
+loop
+stop
+*jump
+no=stat
+exec ""+link(no),16

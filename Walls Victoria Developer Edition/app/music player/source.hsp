@@ -1,0 +1,71 @@
+*home
+	#uselib "shell32.dll"
+	#func DragAcceptFiles "DragAcceptFiles" int,int
+	#func DragQueryFile   "DragQueryFileA"  int,int,int,int
+	#func DragQueryPoint  "DragQueryPoint"  int,int
+	#func DragFinish      "DragFinish"      int
+
+	#define WM_DROPFILES      0x0233
+
+	color 255,255,255:boxf
+	screen 0,451,200
+	title"Music Player"
+	#uselib "shell32.dll"
+
+	pos 351,0
+	objsize 100,67
+	button "ファイルを開く", *fileopen
+	button "再生", *sound_play
+	button "停止", *sound_stop
+	
+; メッセージ処理の登録
+	oncmd gosub *OnDropFiles, WM_DROPFILES
+
+; ドロップファイルの受け入れを設定
+	DragAcceptFiles hwnd, 1
+	if stat == 0 {
+    dialog "設定に失敗しました。", 1, "エラー"
+    end
+	}	
+	color 150,150,150:boxf 0,0,350,200
+	color 0,0,0
+	line 0,200,350,200
+	pos 25,70
+	color 255,255,255
+	mes "ファイルを選択するか、\nここにドラック＆ドロップしてください。"
+	stop
+
+*OnDropFiles
+; ====== ファイルがドロップされたときの処理 ======
+	hDrop = wparam                    ; データ構造体のハンドル
+
+
+; ファイルの数の取得
+	DragQueryFile hDrop, -1, 0, 0     ; 第2パラメータを -1 に
+	filecount = stat                  ; ドロップされたファイル数
+
+; ファイル名の取得（ドロップされたファイルの数だけ実行）
+	sdim filename, 260                ; ファイル名を格納するバッファ
+	repeat filecount
+    DragQueryFile hDrop, cnt, varptr(filename), 260
+    mmload filename:mmplay
+    title"Music Player - "+filename+""
+	loop
+
+; ドロップファイル用のメモリを解放
+	DragFinish hDrop
+	return 0
+
+*fileopen
+	dialog "wav;*.mp3;*.mid;*.wma", 16, "音楽ファイル"
+	if stat = 0 :stop
+*sound_play
+	mmload refstr, 0
+	mmplay 0
+	title"Music Player - "+refstr+""
+	stop
+
+*sound_stop
+	mmstop 
+	title"Music Player **STOP**"
+	stop

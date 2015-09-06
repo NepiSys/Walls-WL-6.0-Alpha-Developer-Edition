@@ -1,0 +1,107 @@
+#include "user32.as"
+#include "comctl32.as"
+
+#define WS_CLIPSIBLINGS     0x04000000
+#define WS_CHILD            0x40000000
+#define WS_VISIBLE          0x10000000
+#define TCIF_TEXT               0x0001
+#define TCM_FIRST               0x1300  
+#define TCM_INSERTITEMA         (TCM_FIRST + 7)
+#define TCM_GETCURSEL           (TCM_FIRST + 11)
+#define TCM_ADJUSTRECT          (TCM_FIRST + 40)
+#define SW_HIDE             0
+#define SW_SHOW             5
+#enum BTID_BACK = 0
+#enum BTID_REFRESH
+#enum BTID_FORWARD
+#enum BTID_HOME
+#enum BTID_CLOSE
+#define WM_NOTIFY                       0x004E
+#define TCN_FIRST               (-550)
+#define TCN_SELCHANGE           (TCN_FIRST - 1)
+
+	screen 0,1000,600
+	// タブコントロール作成
+	InitCommonControls
+	winobj "systabcontrol32", "", 0, WS_CLIPSIBLINGS|WS_CHILD|WS_VISIBLE, ginfo_sx, ginfo_sy, 0, 0
+	hTab = objinfo_hwnd(stat)
+	if hTab == 0 : end
+
+	// タブアイテム追加
+	dim tci, 7
+	sdim buf, 10, 5
+	buf = "タブ1", "タブ2"
+	repeat 2
+		tci = TCIF_TEXT, 0, 0, varptr(buf.cnt), strlen(buf.cnt)
+		sendmsg hTab, TCM_INSERTITEMA, cnt, varptr(tci)
+	loop
+
+	// ボタン作成
+	dim rect, 4
+	sendmsg hTab, TCM_ADJUSTRECT, 0, varptr(rect)
+	btw = 50
+	bth = 24
+	buf = "戻る", "更新", "進む", "HOME", "閉じる"
+	pos rect.0, rect.1
+	repeat 5
+		if cnt == 3 : btw = 60
+		objsize btw, bth
+		button buf.cnt, *lb_button
+		if cnt == 0 : btFirst = stat	//最初のボタンIDを保存
+		pos ginfo_cx+btw, rect.1
+	loop
+
+	// IEオブジェクト作成
+	dimtype ie, vartype("comobj"), 2
+	sdim urls, 1024, 2
+	urls.0 = "http://www.yahoo.co.jp/"
+	urls.1 = "http://www.google.co.jp/webhp?sourceid=navclient&hl=ja&ie=UTF-8"
+	repeat 2
+		pos rect.0, rect.1+bth
+		axobj ie.cnt, "Shell.Explorer.2", ginfo_sx-rect.0, ginfo_sy-bth-rect.1
+		if cnt == 0 : ieFirst = stat	// 最初のIEのオブジェクトIDを保存
+		if cnt == 1 : ShowWindow objinfo_hwnd(stat), SW_HIDE	// 二つ目のIEを非表示に
+		tmp = ie.cnt	// ie.cnt->"navigate"だとエラー???
+		tmp->"navigate" urls.cnt
+		delcom tmp
+	loop
+	ieID = 0	//アクティブなタブID
+	activeIE = ie.ieID //アクティブなIEオブジェクト
+	oncmd gosub *lb_OnNotify, WM_NOTIFY
+
+*lb_button
+	// ボタンが押された
+	switch stat-btFirst
+		case BTID_BACK
+			activeIE->"GoBack"
+			swbreak
+		case BTID_REFRESH
+			activeIE->"Refresh2" 3
+			swbreak
+		case BTID_FORWARD
+			activeIE->"GoForward"
+			swbreak
+		case BTID_HOME
+			activeIE->"Navigate" urls.ieID
+			swbreak
+		case BTID_CLOSE
+			delcom activeIE
+			end
+			swbreak
+	swend
+	stop
+
+*lb_OnNotify
+	dupptr nmhdr, lparam, 12
+
+	// タブが変更された
+	if nmhdr.0 = hTab & nmhdr.2 = TCN_SELCHANGE {
+		ShowWindow objinfo_hwnd(ieID+ieFirst), SW_HIDE	// アクティブだったタブのIEを非表示に
+		sendmsg hTab, TCM_GETCURSEL, 0, 0				// アクティブになったタブのID取得
+		ieID = stat
+		ShowWindow objinfo_hwnd(ieID+ieFirst), SW_SHOW	// アクティブになったタブのIEを表示
+		// activeIEも変更する
+		delcom activeIE
+		activeIE = ie(ieID)	
+	}
+	return

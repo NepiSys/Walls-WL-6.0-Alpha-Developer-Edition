@@ -1,0 +1,28 @@
+//”wŒi‚ÆƒEƒBƒ“ƒhƒE‚Ì•`‰æ
+	clrobj
+	pos 0,0
+	
+	if haikei="gazo"{
+		gcopy 114,0,0,1024,576
+	}else{
+		gcopy 15,0,0,1024,576
+	}
+	
+	#include "tskbutton.hsp"
+	
+	color r,g,b:gmode 4,,,128
+	boxfa 20,20,1004,511
+	
+	if notopenw=1{
+		repeat 10
+			color 255,255,255:gmode 4,,,128
+			boxfa 25,55,999,506
+			wait 2
+		loop
+	}
+	notopenw=0
+	onclick*sm_click
+	
+	color 255,255,255
+	boxf 25,55,999,506
+	gmode 0

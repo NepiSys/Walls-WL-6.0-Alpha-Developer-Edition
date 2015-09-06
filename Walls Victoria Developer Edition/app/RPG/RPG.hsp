@@ -1,0 +1,172 @@
+*home
+	title"史上最悪なRPG"
+	onexit*owari
+	you=10000
+	teki=10000
+	picload"img/start.png"
+	objsize 100,30
+	pos 250,250:button"START",*start
+	pos 250,280:button"EXIT",*owari
+	buffer 1
+	picload "img/nimuge.jpg"
+	buffer 2
+	picload "img/teki.png"
+	gsel 0
+	stop
+*owari
+	end
+*start
+	cls
+	gcopy 1,0,0,600,400
+	#module
+	#deffunc boxfa int ax, int ay, int bx, int by
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	return
+	#global
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	mes"ここは聖ニムゲ歴35681年のニムゲ星\nヘクサリア共和国オナラビア州にあるとある町。"
+	pos 500,20:button"次へ",*start2
+	stop
+*start2
+	cls
+	gcopy 1,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	mes"この町はスカシッペ教とオナラスカ教の聖地で、ほぼ毎日\nスカシッペ教とオナラスカ教の軍事衝突が起きている。"
+	pos 500,20:button"次へ",*start3
+	stop
+*start3
+	cls
+	gcopy 1,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	mes"いきなりですが、あなたは今日からスカシッペ教の兵士です。\nあなたはオナラスカ教の兵士と闘うことになります。"
+	pos 500,20:button"START",*main
+	stop
+*main
+	cls
+	if you<0:dialog"あなたは戦死しました。",,"ゲームオーバー"
+	if teki<0:dialog"You win!"
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	mes"敵が現れた！どうする？\nYOU:"+you+"　敵："+teki+"
+	objsize 120,25
+	pos 240,0:button"逃げる",*nigeru
+	pos 240,25:button"鯖の味噌汁キック",*sabanomiso
+	pos 360,0:button"ドラゴンの鼻水ビーム",*hanamizu
+	pos 360,25:button"ゴリラの鼻くそボンバー",*hanakuso
+	pos 480,0:button"禿げたおっさんビーム",*hageta
+	pos 480,25:button"スターリンのオルガン",*orugan
+	stop
+*nigeru
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	mes"逃げられなかった！"
+	wait 200:goto*main
+	stop
+*sabanomiso
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)
+	if damage<500:mes"鯖の味噌汁キックをした！\n敵に"+damage+"のダメージ":teki=teki-damage
+	if damage>500:mes"鯖の味噌汁キックをした！\nしかし、相手には効かなかった"
+	wait 200:goto*sikaesi
+	stop
+*sikaesi
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)-gettime(6)
+	if damage<500:mes"相手の仕返し\n"+damage+"のダメージを食らった":you=you-damage
+	if damage>500:mes"相手の仕返し\nしかし、効かなかった"
+	wait 200:goto*main
+	stop
+*hanamizu
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)
+	if damage<500:mes"ドラゴンの鼻水ビームをした！\n敵に"+damage+"のダメージ":teki=teki-damage
+	if damage>500:mes"ドラゴンの鼻水ビームをした！\nしかし、相手には効かなかった"
+	wait 200:goto*sikaesi
+	stop
+*hanakuso
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)
+	if damage<500:mes"ゴリラの鼻くそボンバーをした！\n敵に"+damage+"のダメージ":teki=teki-damage
+	if damage>500:mes"ゴリラの鼻くそボンバーをした！\nしかし、相手には効かなかった"
+	wait 200:goto*sikaesi
+	stop
+*hageta
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)
+	if damage<500:mes"禿げたおっさんビームをした！\n敵に"+damage+"のダメージ":teki=teki-damage
+	if damage>500:mes"禿げたおっさんビームをした！\nしかし、相手には効かなかった"
+	wait 200:goto*sikaesi
+	stop
+*orugan
+	cls
+	gcopy 2,0,0,600,400
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	color:gmode 3,,,128
+	boxfa 0,0,600,50
+	color 255,255,255
+	damage=gettime(7)
+	mes"スターリンのオルガンを使って相手を撃った！\nしかし、的中しなかった"
+	wait 200:goto*sikaesi
+	stop

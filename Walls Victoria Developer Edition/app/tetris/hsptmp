@@ -1,0 +1,386 @@
+	title"ÉeÉgÉäÉX"
+*tetris
+	#module Window
+
+	#const WIDTH_ 640
+	#const HEIGHT 480
+	#const ID 0
+	#const FRAME_PER_SECOND 50
+	#const MILISECOND_PER_FRAME 1000/FRAME_PER_SECOND
+
+#deffunc init@Window
+	screen ID, WIDTH_, HEIGHT
+	return
+
+#global
+
+
+#module Block
+
+	#const PIXELS_IN_WIDTH 20
+	#const PIXELS_IN_HEIGHT 20
+
+	; ---- ÉuÉçÉbÉNÇÃéÌóﬁ ----
+	#enum NONE = 0
+	#enum BLOCK
+	#enum WALL
+
+#deffunc show@Block int type, int x, int y
+	switch type
+	case NONE@Block
+		swbreak
+
+	case BLOCK@Block
+		color 0,0,0
+		boxf x, y, x+PIXELS_IN_WIDTH, y+PIXELS_IN_HEIGHT
+		swbreak
+
+	case WALL@Block
+		color 128,128,128
+		boxf x, y, x+PIXELS_IN_WIDTH, y+PIXELS_IN_HEIGHT
+		swbreak
+
+	default
+		swbreak
+	swend
+	return
+#global
+
+#module FallingBlock
+
+	#const SIDE_LENGTH 4
+	#const CELLS_IN_WIDTH SIDE_LENGTH
+	#const CELLS_IN_HEIGHT SIDE_LENGTH
+	#const TYPE_MAX 7
+
+	#const INITIAL_X 3
+	#const INITIAL_Y 1
+
+#deffunc setTemplate@FallingBlock int type, array template
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			if ( strmid( template(iy), ix*2, 2 ) == "Å†" ) {
+				blockTemplates(type, ix, iy) = NONE@Block
+			} else {
+				blockTemplates(type, ix, iy) = BLOCK@block
+			}
+		next
+	next
+	set@FallingBlock
+	return
+
+#deffunc init@FallingBlock
+	dim block@FallingBlock, CELLS_IN_WIDTH, CELLS_IN_HEIGHT
+	dim blockTemplates, TYPE_MAX, CELLS_IN_WIDTH, CELLS_IN_HEIGHT
+
+	dim t, CELLS_IN_HEIGHT
+
+	; ÉeÉgÉäÉXñ_
+	t(0) = "Å†Å†Å°Å†"
+	t(1) = "Å†Å†Å°Å†"
+	t(2) = "Å†Å†Å°Å†"
+	t(3) = "Å†Å†Å°Å†"
+	setTemplate 0, t
+
+
+	; ê≥ï˚å`
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å°Å°Å†"
+	t(2) = "Å†Å°Å°Å†"
+	t(3) = "Å†Å†Å†Å†"
+	setTemplate 1, t
+
+	; Çkéö
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å°Å°Å†"
+	t(2) = "Å†Å†Å°Å†"
+	t(3) = "Å†Å†Å°Å†"
+	setTemplate 2, t
+
+	; ãtÇkéö
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å°Å°Å†"
+	t(2) = "Å†Å°Å†Å†"
+	t(3) = "Å†Å°Å†Å†"
+	setTemplate 3, t
+
+	; Çyå^
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å°Å°Å†"
+	t(2) = "Å†Å†Å°Å°"
+	t(3) = "Å†Å†Å†Å†"
+	setTemplate 4, t
+
+	; ãtÇyå^
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å†Å°Å°"
+	t(2) = "Å†Å°Å°Å†"
+	t(3) = "Å†Å†Å†Å†"
+	setTemplate 5, t
+
+	; Çséö
+	t(0) = "Å†Å†Å†Å†"
+	t(1) = "Å†Å°Å°Å°"
+	t(2) = "Å†Å†Å°Å†"
+	t(3) = "Å†Å†Å†Å†"
+	setTemplate 6, t
+
+	return
+
+
+#deffunc set@FallingBlock
+	type = rnd(TYPE_MAX) 
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			block@FallingBlock(ix, iy) = blockTemplates(type, ix, iy)
+		next
+	next
+
+	x = INITIAL_X
+	y = INITIAL_Y
+
+	return
+
+
+#deffunc show@FallingBlock int offsetX, int offsetY
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			show@Block block@FallingBlock(ix, iy), offsetX+(x+ix)*PIXELS_IN_WIDTH@Block, offsetY+(y+iy)*PIXELS_IN_HEIGHT@Block
+		next
+	next
+	return
+	
+#deffunc rotate@FallingBlock
+	dim block_buf, CELLS_IN_WIDTH, CELLS_IN_HEIGHT
+
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			block_buf(CELLS_IN_WIDTH-1-iy, ix) = block@FallingBlock(ix, iy)
+		next
+	next
+
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			block@FallingBlock(ix, iy) = block_buf(ix, iy)
+		next
+	next
+	return
+
+
+#global
+
+#module Field
+
+	#const WALL_THICKNESS 1
+
+	#const CELLS_IN_WIDTH 10 + ( WALL_THICKNESS * 2 )
+	#const CELLS_IN_HEIGHT 20 + ( WALL_THICKNESS * 2 )
+	#const PIXELS_IN_WIDTH ( PIXELS_IN_WIDTH@Block * CELLS_IN_WIDTH )
+	#const PIXELS_IN_HEIGHT ( PIXELS_IN_HEIGHT@Block * CELLS_IN_HEIGHT )
+	#const X 100
+	#const Y 10
+	#define BACKGROUND_COLOR 255,255,255
+	#define FOREGROUND_COLOR 0,0,0
+
+	
+	#enum TRUE = 0
+	#enum FALSE
+
+#deffunc init@Field
+	dim cells, CELLS_IN_WIDTH, CELLS_IN_HEIGHT
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			cells(ix,iy) = NONE@Block
+		next
+	next
+
+	for ix, 0, CELLS_IN_WIDTH, 1
+		for iy, 0, WALL_THICKNESS, 1
+			cells(ix, iy) = WALL@Block
+			cells(ix, CELLS_IN_HEIGHT-1-iy) = WALL@Block
+		next
+	next
+
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, WALL_THICKNESS, 1
+			cells(ix, iy) = WALL@Block
+			cells(CELLS_IN_WIDTH-1-ix, iy) = WALL@Block
+		next
+	next
+
+	return
+
+
+#deffunc show@Field
+
+	color BACKGROUND_COLOR
+	boxf X, Y, X+PIXELS_IN_WIDTH, Y+PIXELS_IN_HEIGHT
+
+	color FOREGROUND_COLOR
+	pos X, Y
+	line X+PIXELS_IN_WIDTH, Y
+	line X+PIXELS_IN_WIDTH, Y+PIXELS_IN_HEIGHT
+	line X, Y+PIXELS_IN_HEIGHT
+	line X, Y
+
+	for iy, 0, CELLS_IN_HEIGHT, 1
+		for ix, 0, CELLS_IN_WIDTH, 1
+			show@Block cells(ix, iy), X+ix*PIXELS_IN_WIDTH@Block, Y+iy*PIXELS_IN_HEIGHT@Block
+		next
+	next
+
+	return
+
+
+#deffunc put@Field
+	for iy, 0, CELLS_IN_HEIGHT@FallingBlock, 1
+		for ix, 0, CELLS_IN_WIDTH@FallingBlock, 1
+			if ( ix+x@FallingBlock < 0 || ix+x@FallingBlock >= CELLS_IN_WIDTH@Field ) {
+				_continue
+			}
+			if ( iy+y@FallingBlock < 0 || iy+y@FallingBlock >= CELLS_IN_HEIGHT@Field ) {
+				_continue
+			}
+			if ( block@FallingBlock(ix,iy) != NONE@Block ) {
+				cells(ix+x@FallingBlock,iy+y@FallingBlock) = block@FallingBlock(ix,iy)
+			}
+		next
+	next
+
+	return
+
+#defcfunc lineFilled int ty
+	for ix, WALL_THICKNESS, CELLS_IN_WIDTH - WALL_THICKNESS, 1
+		if ( cells(ix, ty) == NONE@Block ) {
+			return FALSE
+		}
+	next
+	return TRUE
+
+
+#deffunc deleteRow@Field
+	for iy, WALL_THICKNESS, CELLS_IN_HEIGHT - WALL_THICKNESS, 1
+		if ( lineFilled(iy) == TRUE ) {
+			for iy2, iy, WALL_THICKNESS, -1
+				for ix2, WALL_THICKNESS, CELLS_IN_WIDTH - WALL_THICKNESS, 1
+					cells(ix2, iy2) = cells(ix2, iy2-1)
+				next
+			next
+			
+			for ix2, WALL_THICKNESS, CELLS_IN_WIDTH - WALL_THICKNESS, 1
+				cells(ix2, WALL_THICKNESS) = NONE@Block
+			next
+		}
+	next
+	return
+
+
+#deffunc fall@Field
+	y@FallingBlock++
+	if ( check() == FALSE ) {
+		y@FallingBlock--
+		put
+
+		deleteRow
+		set@FallingBlock
+	}
+	return
+
+
+#defcfunc check@Field
+	for iy, 0, CELLS_IN_HEIGHT@FallingBlock, 1
+		for ix, 0, CELLS_IN_WIDTH@FallingBlock, 1
+			if ( ix+x@FallingBlock < 0 || ix+x@FallingBlock >= CELLS_IN_WIDTH@Field ) {
+				_continue
+			}
+			if ( iy+y@FallingBlock < 0 || iy+y@FallingBlock >= CELLS_IN_HEIGHT@Field ) {
+				_continue
+			}
+			if ( cells(ix+x@FallingBlock,iy+y@FallingBlock) != NONE@Block ) {
+				if ( block@FallingBlock(ix,iy) != NONE@Block ) {
+					return FALSE
+				}
+			}
+		next
+	next
+	return TRUE
+
+#global
+
+#module KEY
+	#const UP 2
+	#const DOWN 8
+	#const RIGHT 4
+	#const LEFT 1
+#global
+
+*init
+	init@Window
+	init@Field
+	init@FallingBlock
+	set@FallingBlock
+	picload"haikei.jpg"
+	
+	#module
+	#deffunc boxfa int ax, int ay, int bx, int by
+	pdx = ax, bx, bx, ax
+	pdy = ay, ay, by, by
+	gsquare -1,pdx, pdy
+	return
+	#global
+	color:gmode 3,,,128
+	boxfa 0,0,1000,1000
+	
+	objsize 200,30
+	pos 400,10
+	button"èIóπ",*exit
+	mmload"BGM.mid",,1 //BGM.midÇÉãÅ[Évçƒê∂
+	mmplay 
+*main
+	redraw 0
+	show@Field
+	show@FallingBlock X@Field, Y@Field
+	redraw 1
+
+	if ( check@Field() == FALSE@Field ) {
+		dialog ("ÉQÅ[ÉÄÉIÅ[ÉoÅ[")
+		goto *init
+	}
+
+	stick k, DOWN@KEY|RIGHT@KEY|LEFT@KEY
+	if ( k&RIGHT@KEY ) {
+		x@FallingBlock++
+		if ( check@Field() == FALSE@Field ) {
+			x@FallingBlock--
+		}
+	}
+	if ( k&LEFT@KEY ) {
+		x@FallingBlock--
+		if ( check@Field() == FALSE@Field ) {
+			x@FallingBlock++
+		}
+	}
+	if ( k&UP@KEY ) {
+		rotate@FallingBlock
+		if ( check@Field() == FALSE@Field ) {
+			rotate@FallingBlock
+			rotate@FallingBlock
+			rotate@FallingBlock
+		}
+	}
+
+	if ( k&DOWN@KEY ) {
+		fallTimer -= 100
+	}
+
+	fallTimer--
+	if ( fallTimer < 0 ) {
+		fall@Field
+		fallTimer = 1000 / MILISECOND_PER_FRAME@Window
+	}
+
+	await MILISECOND_PER_FRAME@Window
+	goto *main
+	stop
+*exit
+	end

@@ -1,0 +1,250 @@
+//たぶんこのソースを参考にする場合デバッグ必須です。
+//変数名が実際の動作と違う場合があります。
+
+//Walls WL 6.0 Main Source Code
+#include "Walls.as"
+#include "WallAPI.hsp"
+#include "WallWindowAPI.hsp"
+#include "WallGraphicsAPI.hsp"
+#include "user32.as"
+screen 0,1024,576
+GetClassLong hwnd, -26
+SetClassLong hwnd, -26, stat | $8
+color 0,0,0
+buffer 1
+font "",70
+mes OSID
+mx=ginfo_mesx
+my=ginfo_mesy
+gsel 0,1
+
+//mouse -1
+/*Test Only Code*/
+repeat 2
+redraw 0
+color 255,255,255:boxf:color
+gmode 3,,,cnt
+pos (ginfo_winx-mx)/2,(ginfo_winy-my)/2
+gcopy 1,0,0,398,60 
+await 
+redraw 1
+loop
+/*Test Only Code*/
+
+WallPaper ="desktop/desktop22.png"
+celload "img/mouse.png",2
+Mouse_ID=2
+oncmd gosub *LMButtonDown ,0x0202 //意味逆
+oncmd gosub *LMButtonDoble ,0x0203
+oncmd gosub *LMButtonUP ,0x0201//意味逆
+celload WallPaper,1
+wi=8
+addWindow "FirstWindow",20,200,200,60,70,3
+TaskMenuBufferID=300
+IconSize =30.0
+Grip=IconSize+5
+ActiveIcon=-1
+ldima IconLabel
+AddIcon "img/ico/krone.png",1,1,7,*awindow
+AddIcon "img/ico/file.png",1,2,8,*awindow2
+TaskMenuAddSize=100
+TaskMenuAngle=30
+TaskMenuBarChange=1
+color 255,153, 51
+repeat
+redraw 0
+pos 0,0
+celput 1
+	getkey winclick,1
+	repeat length(win)
+	if(cnt==0){
+		continue
+	}
+		winmx=mousex
+		winmy=mousey
+		if(winmx > winposx.cnt && winmx < winposx.cnt+winsizex.cnt && winmy > winposy.cnt && winmy < winposy.cnt+wintilesizey.cnt && bc==0){
+			if(winmx > winposx.cnt+winsizex.cnt-30&& winmx<winposx.cnt+winsizex.cnt&& winmy > winposy.cnt && winmy < winposy.cnt+wintilesizey.cnt){
+					if(LMButtonUpf==1 && CloseWinTempFlagment == 0){
+						CloseWinTempFlagment=1
+					}
+					if(CloseWinTempFlagment == 1 && LMButtonDownf ==1){
+						CloseWin cnt
+						CloseWinTempFlagment=0
+					}
+		
+			}else{
+				CloseWinTempFlagment=0
+				if(winclick==1){
+					activewindow=cnt
+					bc=1
+				}else{
+					bc=0
+				}
+			}
+		}else{
+			if( winmx > winposx.cnt && winmx < winposx.cnt+winsizex.cnt && winmy > winposy.cnt && winmy < winposy.cnt+winsizey.cnt){
+				if(bc==0 && winclick==1 && WindowFocus == 0){
+					WindowFocus = 1
+					activewindow=cnt
+				}
+			}else{
+				if(bc==0 && winclick==1 && WindowFocus == 0){
+					WindowFocus = 0
+					activewindow=0
+				}
+			}
+		}
+		if(WindowFocus==1 && winclick ==0){
+			WindowFocus=0
+		}
+		if(bc==1 && bco==0){
+			winposxx.activewindow=mousex-winposx.activewindow
+			winposyy.activewindow=mousey-winposy.activewindow
+		}
+		if(bc==1){
+			winposx.activewindow=mousex-winposxx.activewindow
+			winposy.activewindow=mousey-winposyy.activewindow
+		}
+	loop
+	repeat length(Micon)
+	if(cnt==0){
+		continue
+	}
+	getkey icoclick,1
+	//Warnig!!Walls WL Bug :It would run the icon under the window
+	if (mousex >= Miconposx.cnt*Grip && mousex <= (MIconposx.cnt*Grip)+IconSize && mousey >= Miconposy.cnt*Grip && mousey <= (MIconposy.cnt*Grip)+IconSize && icoclick==1 && icoclickold==0 ){
+			MovingIcon=cnt
+			OnIconMoving=1
+	}
+	
+	if( MovingIcon ==cnt && icoclick ==0&&icoclickold==1 ){
+			MovingIcon=-1
+	}
+	
+	if(MovingIcon == cnt && dc==1){
+		icoclick=0
+		bc=0
+		dc=0
+		MovingIcon=-1
+		gosub IconLabel.cnt
+	}
+	if(MovingIcon == cnt && dc==0){
+		if(OnIconMoving==1){
+			MIconposx2.cnt=mousex-(IconSize/2)//-MIconposxx.cnt
+			MIconposy2.cnt=mousey-(IconSize/2)//-MIconposyy.cnt
+			MIconposx.cnt=int(double(mousex)/Grip)
+			MIconposy.cnt=int(double(mousey)/Grip)
+		}else{
+			MIconposx.cnt=int(double(mousex)/Grip)//小数点切り捨て。これ重要
+			MIconposy.cnt=int(double(mousey)/Grip)
+			
+		}
+	}
+	loop
+
+if(TaskMenuBarChange==1){
+if(TaskMenuBufferID<ginfo_act){
+	TaskMenuBufferID=ginfo_act
+}
+buffer TaskMenuBufferID,232+TaskMenuAddSize,TaskMenuAngle+40
+color 255,153, 51
+gpline TaskMenuAngle, TaskMenuAngle+10,0,0
+gpline TaskMenuAddSize, TaskMenuAngle+10,TaskMenuAngle+TaskMenuAddSize,0
+line TaskMenuAddSize+1,39,TaskMenuAngle,39
+color 255,153, 51
+PaintOut 70, 20, 255,153, 51
+TaskMenuBarChange=0
+gsel 0,0
+}
+color 255,100, 0
+inpos 45,7
+boxp 40,7
+pos (ginfo_winx-TaskMenuAddSize)/2,0
+color 255,255,255
+gmode 4,232,30,230
+celput TaskMenuBufferID
+repeat length(Micon)
+	if(cnt==0){
+		continue
+	}
+	if(MovingIcon == cnt &&  OnIconMoving==1){
+		continue
+	}else{
+		pos MIconposx.cnt*Grip,MIconposy.cnt*Grip
+		color 255,255,255
+		gmode 4,IconSize,IconSize,255
+		gcopy Micon.cnt,0,0,IconSize,IconSize
+	}
+	loop
+	if(OnIconMoving==1 && MovingIcon!=-1){
+	
+		gmode 4,IconSize,IconSize,150
+		color 255,255,255
+		pos MIconposx2.MovingIcon,MIconposy2.MovingIcon
+		gcopy Micon.MovingIcon,0,0,IconSize,IconSize
+	}
+	repeat length(win)
+		if(cnt==0){
+		continue
+		}
+			if(cnt==activewindow){
+				continue
+			}
+			pos winposx.cnt,winposy.cnt
+			gmode 3,winsizex.cnt+1,winsizey.cnt+1,200
+			gcopy win.cnt,0,0,winsizex.cnt+1,winsizey.cnt+1
+		loop
+		if(activewindow!=0){
+		pos winposx.activewindow,winposy.activewindow
+		gmode
+		gcopy win(activewindow),0,0,winsizex.activewindow+1,winsizey.activewindow+1
+		}
+
+
+		pos mousex,mousey
+		color 200,200,200
+		gmode 4,32,32,255
+		celput Mouse_ID
+icoclickold=icoclick
+bco=bc
+redraw 1
+await
+loop
+*LMButtonUP
+	LMButtonUPf==1
+	icoclick=0
+	bc=0
+	LMButtonDownf=0
+	dc=0
+	return
+*LMButtonDown
+	icoclick=0
+	LMButtonUPf=0
+	bc=0
+	LMButtonDownf=1
+	dc=0
+	return
+*LMButtonDoble
+	LMButtonDownf=0
+	LMButtonUPf=0
+	icoclick=0
+	bc=0
+	dc=0
+	dc=1
+	return
+*awindow
+	//wx+100
+	//wy+100
+	wi+1
+	//activewindow=wi
+	addWindow "Krone:"+wi,20,200,200,wx,wy,wi
+	return
+*awindow2
+	//wx+100
+	//wy+100
+	wi+1
+	//activewindow=wi
+	TaskMenuAddSize+30
+	TaskMenuBarChange=1
+	//addWindow "Files:"+wi,20,200,200,wx,wy,wi
+	return

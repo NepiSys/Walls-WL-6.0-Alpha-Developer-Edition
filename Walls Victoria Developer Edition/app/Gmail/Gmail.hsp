@@ -1,0 +1,71 @@
+*intar_net
+#include "mod_stbar.as"
+#define DIID_DWebBrowserEvents2 "{34A715A0-6587-11D0-924A-0020AFC7AC4D}"
+#define DISPID_NAVIGATECOMPLETE2 252
+
+	likename="likeword.iel"
+	inidate=""
+	kazoe=0
+	sx=1100:sy=700
+	gsel 0,-1
+	screen 1,sx,sy,0,220,15
+	stbar_ini
+
+	exist likename
+	if strsize<0 : goto *ue
+	notesel inidata
+	noteload likename
+	h=""
+	repeat noteinfo(0)
+	noteget h,cnt : word(cnt)=h
+	loop
+	wordba=noteinfo(0)
+*ue
+	title"Gmail"
+	sdim url,512
+	url="https://mail.google.com"
+*ue2
+	cls
+	objsize sx,24
+	pos 0,2:mes "URL:"
+	pos 40,0:input url:obj_url=stat
+	pos 0,48
+	axobj ie, "Shell.Explorer.2",sx,sy-72
+	num=stat
+	comevent ie_event, ie, "{34A715A0-6587-11D0-924A-0020AFC7AC4D}",*event 
+	ie->"Navigate" url
+	stop
+*intemain
+	stop
+*event
+	dispid = comevdisp(ie_event)
+	if dispid = DISPID_NAVIGATECOMPLETE2 : gosub *OnNavigateComplete2
+	return
+*OnNavigateComplete2
+	name = ie("LocationURL")
+
+	inidate="":notesel url
+	noteadd url,wordba+kazoe
+	notesave likename
+
+	kazoe=kazoe+1
+
+	objprm obj_url,name
+	pDoc = ie("Document")
+	name = pDoc("Title")
+	stbar_text name
+	delcom pDoc
+	return
+	*wow
+	ie->"Navigate" url
+	goto *intemain
+	*go_f
+	ie->"GoForward"
+	goto *intemain
+	*go_b
+	ie->"GoBack"
+	goto *intemain
+	*go_bb
+	ie->"GoBack"
+	ie->"GoBack"
+	goto *intemain

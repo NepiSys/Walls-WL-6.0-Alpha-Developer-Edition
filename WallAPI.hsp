@@ -1,0 +1,279 @@
+//WallAPI
+//(C) 2015 NEPISAT
+//ソース引用様: 今のところなし
+
+#include "obj.as"
+#module WallAPI
+#include "user32.as"
+/*ConfigGetStr*/
+//GetBoolの文字列完全一致版　あった場合1が返される
+//なかった場合 -1
+//文字がない場合 -2
+#defcfunc ConfigGetStr str Search_Str_fname, str Search_Str_cstring
+notesel Search_Str_file
+noteload Search_Str_fname
+if( notemax <= 0){
+	return -2
+}
+repeat notemax
+noteget Search_Str_fas.cnt,cnt
+loop
+notesel Search_Str_fa
+repeat length(Search_Str_fas) 
+noteadd Search_Str_fas.cnt,cnt,0
+loop
+repeat length(Search_Str_fas)
+	Search_Str_keyword = Search_Str_cstring
+	Search_Str_Te = "" : Search_Str_i = 0
+	repeat -1,1
+		getstr Search_Str_Te, Search_Str_fa, Search_Str_i	
+		if strsize == 0 : break
+		if Search_Str_te == Search_Str_keyword {	
+			noteunsel
+			return cnt
+		}
+		Search_Str_i += strsize			
+	loop
+
+loop
+noteunsel
+return -1
+*LoadFileFound
+	ConfigGetStr_Error=1
+return
+/*
+ConfigGetBool : テキスト内のキーに対応した 真か偽を読み込みます)
+ConfigGetBool(ファイル名 , キー) 戻り値: true=1,false =0,無し=-1
+*/
+#defcfunc ConfigGetBool str Search_Str_FileName, str Search_Str_CString
+if(ConfigGetStr(Search_Str_FileName,Search_Str_CString+" = true")>=0){
+	return 1
+}
+if(ConfigGetStr(Search_Str_FileName,Search_Str_CString+" = false") >= 0){
+	return 0
+}
+return -1
+
+
+
+/*
+ConfigSetBool : テキスト内のキーに対応した 真か偽を書き込みます
+すでにあるキーの場合、今のキーと違う真偽だと上書きされます。
+ConfigSetBool(ファイル名 , キー ,真偽))
+*/
+#deffunc ConfigSetBool str ConfigSetBool_FileName, str ConfigSetBool_Key , str ConfigSetBool_SetKey
+	if(ConfigGetBool(ConfigSetBool_FileName,ConfigSetBool_Key) == 1 || ConfigGetBool(ConfigSetBool_FileName,ConfigSetBool_Key) == 0){
+		if(ConfigGetStr(ConfigSetBool_FileName,ConfigSetBool_Key+" = true") >=0 &&ConfigSetBool_SetKey =="false"){
+				notesel ConfigSetBool_file
+				noteload ConfigSetBool_FileName
+				noteadd ConfigSetBool_Key + " = " +ConfigSetBool_SetKey,ConfigGetStr(ConfigSetBool_FileName,ConfigSetBool_Key+" = true")-1,1
+				notesave ConfigSetBool_FileName
+				noteunsel
+				return
+		}
+		if(ConfigGetStr(ConfigSetBool_FileName,ConfigSetBool_Key+" = false")>=0 && ConfigSetBool_SetKey =="true"){
+				notesel ConfigSetBool_file
+				noteload ConfigSetBool_FileName
+				noteadd ConfigSetBool_Key + " = " +ConfigSetBool_SetKey,ConfigGetStr(ConfigSetBool_FileName,ConfigSetBool_Key+" = false")-1,1
+				notesave ConfigSetBool_FileName
+				noteunsel
+				return
+		}
+		return
+	}
+	notesel ConfigSetBool_file
+	noteload ConfigSetBool_FileName
+	noteadd ConfigSetBool_Key + " = " +ConfigSetBool_SetKey,notemax
+	notesave ConfigSetBool_FileName
+	noteunsel
+return
+
+//OSのNTバージョンを取得 10対応
+#defcfunc GetCurrentOSVer
+#uselib "NTDLL.dll"
+#func global RtlGetVersion "RtlGetVersion" sptr
+dim GetCurrentOSVer_INF, 37
+GetCurrentOSVer_INF = $94
+RtlGetVersion varptr(GetCurrentOSVer_INF)
+return GetCurrentOSVer_INF(1) + "." + GetCurrentOSVer_INF(2)
+
+//CPU名フル取得
+#defcfunc GetCPUName
+#include "advapi32.as"
+GetCPUNAME_Ret_size=128
+SDIM GetCPUNAME_Ret,GetCPUNAME_Ret_size
+RegOpenKeyEx $80000002,("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"),0,$00000001,varptr(GetCPUNAME_hkey)
+RegQueryValueEx GetCPUNAME_hKey,"ProcessorNameString",0,0,varptr(GetCPUNAME_ret),varptr(GetCPUNAME_Ret_size)
+RegCloseKey GetCPUNAME_hKey
+return GetCPUNAME_Ret
+
+//RoatCir : 回転する丸を表示します
+//手抜きなせいで画面更新中は使えない
+// RooatCir 全体のサイズ ,球のサイズ,表示X,表示Y,球の数,回数
+#deffunc RoatCir double RoatSize,double RoatCirSize,int RoatX,int RoatY,int RoatCirCount,int RoatCount
+dim active,10000
+dim th,10000
+defr=ginfo_r
+defg=ginfo_g
+defb=ginfo_b
+ncount=0
+repeat
+redraw 0
+color defr,defg,defb
+boxf RoatX-(int(RoatSize)+int(RoatCirSize)),RoatY-(int(RoatSize)+int(RoatCirSize)),RoatX+int(RoatSize)+int(RoatCirSize)-1,RoatY+int(RoatSize)+int(RoatCirSize)-1
+if ncount<100{
+	if (cnt2/20 <= RoatCirCount){
+		active(cnt2/20)=1
+	}
+	live=0
+	repeat RoatCirCount
+		if (active(cnt)=0){
+			continue
+		}
+	live=live+1
+		if th(cnt)<700 {
+			c=cos(deg2rad(th(cnt)))
+			y=RoatSize*c+RoatY
+			x=-RoatSize*sin( deg2rad(th(cnt)) )+RoatX
+			color 255-defr,255-defg,255-defg
+			circle x-RoatCirSize,y-RoatCirSize,x+RoatCirSize,y+RoatCirSize,1
+			th(cnt)=th(cnt)+(c+2)*(c+2)
+		} else {
+			active(cnt)=0
+			th(cnt)=0
+		}
+	loop
+	if live=0 : ncount=ncount+1
+		cnt2++
+	} else {
+		cntii++
+		if(cntii==RoatCount){
+			break
+		}
+		cnt2=0
+		ncount=0
+	}
+redraw 1
+await 8
+loop
+dim active:dim th
+return
+
+//MoveObject : ボタン等のオブジェクトを動かします。
+//複数ある場合配列として渡すと同期します。
+//最終地点指定を間違えると永遠にリターンしません。 (ひどいとOSがフリーズ→強制再起)
+// MoveObject オブジェクトのstat(配列),最終地点X,最終地点Y,スピード,モード
+//モード一覧
+//0 : X方向に加法
+//1 : X方向に減法
+//2,3 : 0と1のy版
+//4,5,6,7:斜め(ry
+#deffunc MoveObject array MoveObjectStat,int MoveObjectFX1,int MoveObjectFY1 ,int MoveObjectspeed1,int MoveObjectlr1
+MoveObjectFX=MoveObjectFX1
+MoveObjectFY=MoveObjectFY1
+MoveObjectlr=MoveObjectlr1
+MoveObjectspeed=MoveObjectspeed1
+
+repeat length(MoveObjectStat)
+		 MoveObjectHwnd.cnt=objinfo(MoveObjectStat.cnt,2)
+		 getobjsize MoveObjectPos,MoveObjectStat.cnt
+		 MoveObjectPX.cnt=MoveObjectPos.2
+		 MoveObjectPY.cnt=MoveObjectPos.3
+loop
+
+
+repeat
+
+	repeat length(MoveObjectStat)
+	  SetWindowPos MoveObjectHwnd.cnt,0,MoveObjectPX.cnt,MoveObjectPY.cnt,0,0,1
+	  switch MoveObjectlr
+	  	case 0
+	  		if(MoveObjectPX.cnt==MoveObjectFX){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt++
+	  		swbreak
+	  	case 1
+	  	    if(MoveObjectPX.cnt==MoveObjectFX){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt--
+	  		swbreak
+	  	case 2
+	  		if(MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPY.cnt++
+	  		swbreak
+	  	case 3
+	  		if(MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPY.cnt--
+	  		swbreak
+	  	case 4
+	  		if(MoveObjectPX.cnt==MoveObjectFX && MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt++
+	  		MoveObjectPY.cnt++
+	  		swbreak
+	  	case 5
+	  		if(MoveObjectPX.cnt==MoveObjectFX && MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt--
+	  		MoveObjectPY.cnt--
+	  		swbreak
+	  	case 6
+	  		if(MoveObjectPX.cnt==MoveObjectFX && MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt++
+	  		MoveObjectPY.cnt--
+	  		swbreak
+	  	case 7
+	  		if(MoveObjectPX.cnt==MoveObjectFX && MoveObjectPY.cnt==MoveObjectFY){
+				SwitchBreakFlag=1:break
+	 　		}
+	  		MoveObjectPX.cnt--
+	  		MoveObjectPY.cnt++
+	  		swbreak
+	  	swend
+	loop
+	if(SwitchBreakFlag==1){
+		break
+	}
+await MoveObjectspeed
+loop
+MoveObjectFX=0
+MoveObjectFY=0
+MoveObjectlr=0
+MoveObjectspeed=0
+SwitchBreakFlag=0
+repeat length(MoveObjectPos)
+		MoveObjectPos.cnt=0
+loop
+repeat length(MoveObjectStat)
+		 MoveObjectHwnd.cnt=0
+		 MoveObjectPX.cnt=0
+		 MoveObjectPY.cnt=0
+loop
+
+return
+
+#defcfunc SearchZDim array SearchDim_ar1, int SearchDim_Se1, int SearchDim_notINT1
+SearchDim_ar=SearchDim_ar1
+SearchDim_Se=SearchDim_Se1
+SearchDim_notINT=SearchDim_notINT1
+	repeat length(SearchDim_ar)
+		if(SearchDim_ar.cnt == SearchDim_notINT){
+			continue
+		}
+		if(SearchDim_ar.cnt == SearchDim_Se){
+			return cnt
+		}
+	loop
+	return -1
+#global
+

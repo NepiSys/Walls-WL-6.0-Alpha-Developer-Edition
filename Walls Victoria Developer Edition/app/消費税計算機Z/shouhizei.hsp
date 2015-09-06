@@ -1,0 +1,84 @@
+;消費税計算機 ver.1.0
+*start
+	cls
+	title"消費税計算機Z"
+	nedan=0
+	genka=0
+	sh5=0
+	sh8=0
+	screen 0,200,400
+	color 128,128,128:boxf
+	color 255,255,255:pos 10,10:mes"価格を入力してください"
+	objsize 150,20:input nedan:pos 165,27:mes"円"
+	objsize 160,30
+	
+	genka = 1
+	objsize 50,30
+	pos 20,60:chkbox "原価", genka
+	sendmsg objinfo(stat, 2), $F4, $9
+
+	objsize 100,30
+	pos 70,60:chkbox "消費税5％込み", sh5
+	sendmsg objinfo(stat, 2), $F4, $9
+
+	pos 20,90:chkbox "消費税8％込み", sh8
+	sendmsg objinfo(stat, 2), $F4, $9
+	
+	pos 20,120:button"消費税5％",*s5
+	pos 20,150:button"消費税8％",*s8
+	pos 20,180:button"消費税10％",*s10
+	pos 20,210:button"8％-5％の差額",*s8minus5
+	pos 20,240:button"10％-8％の差額",*s10minus8
+	stop
+*s5
+	nedan=int(nedan)
+	if genka=1:nedan2=nedan
+	if sh5=1:nedan2=nedan*100/105;値段が消費税5％込みの場合、nedanを原価にする
+	if sh8=1:nedan2=nedan*100/108;値段が消費税8％込みの場合、nedanを原価にする	
+	pos 20,280:mes"原価"+nedan2+"円+消費税5％は
+	shouhi=nedan2*105/100
+	mes ""+shouhi+"円です。"
+	button"初期化",*start
+	stop
+*s8
+	nedan=int(nedan)
+	if genka=1:nedan2=nedan
+	if sh5=1:nedan2=nedan*100/105;値段が消費税5％込みの場合、nedanを原価にする
+	if sh8=1:nedan2=nedan*100/108;値段が消費税8％込みの場合、nedanを原価にする	
+	pos 20,280:mes"原価"+nedan2+"円+消費税8％は
+	shouhi=nedan2*108/100
+	mes ""+shouhi+"円です。"
+	button"初期化",*start
+	stop
+*s10
+	nedan=int(nedan)
+	if genka=1:nedan2=nedan
+	if sh5=1:nedan2=nedan*100/105;値段が消費税5％込みの場合、nedanを原価にする
+	if sh8=1:nedan2=nedan*100/108;値段が消費税8％込みの場合、nedanを原価にする	
+	pos 20,280:mes"原価"+nedan2+"円+消費税10％は
+	shouhi=nedan2*110/100
+	mes ""+shouhi+"円です。"
+	button"初期化",*start
+	stop
+*s8minus5
+	nedan=int(nedan)
+	if genka=1:nedan2=nedan
+	if sh5=1:nedan2=nedan*100/105;値段が消費税5％込みの場合、nedanを原価にする
+	if sh8=1:nedan2=nedan*100/108;値段が消費税8％込みの場合、nedanを原価にする
+	pos 20,280:mes"原価"+nedan2+"円の消費税\n8％-5％の差額は"
+	shouhi5=int(nedan)*105/100+nedan
+	shouhi8=int(nedan)*108/100+nedan
+	mes "" + (shouhi8-shouhi5) + "円です。"
+	button"初期化",*start
+	stop
+*s10minus8
+	nedan=int(nedan)
+	if genka=1:nedan2=nedan
+	if sh5=1:nedan2=nedan*100/105;値段が消費税5％込みの場合、nedanを原価にする
+	if sh8=1:nedan2=nedan*100/108;値段が消費税8％込みの場合、nedanを原価にする
+	pos 20,280:mes"原価"+nedan2+"円の消費税\n10％-8％の差額は"
+	shouhi8=int(nedan)*108/100+nedan
+	shouhi10=int(nedan)*110/100+nedan
+	mes "" + (shouhi10-shouhi8) + "円です。"
+	button"初期化",*start
+	stop

@@ -1,0 +1,53 @@
+#module
+
+#deffunc RoatCir double RoatSize,double RoatCirSize,int RoatX,int RoatY,int RoatCirCount,int RoatCount
+dim active,10000
+dim th,10000
+defr=ginfo_r
+defg=ginfo_g
+defb=ginfo_b
+ncount=0
+repeat
+redraw 0
+color defr,defr,defb
+boxf RoatX-(int(RoatSize)+int(RoatCirSize)),RoatY-(int(RoatSize)+int(RoatCirSize)),RoatX+int(RoatSize)+int(RoatCirSize)-1,RoatY+int(RoatSize)+int(RoatCirSize)-1
+if ncount<100{
+	if (cnt2/20 <= RoatCirCount){
+		active(cnt2/20)=1
+	}
+	live=0
+	repeat RoatCirCount
+		if (active(cnt)=0){
+			continue
+		}
+	live=live+1
+		if th(cnt)<700 {
+			c=cos(deg2rad(th(cnt)))
+			y=RoatSize*c+RoatY
+			x=-RoatSize*sin( deg2rad(th(cnt)) )+RoatX
+			color 255-defr,255-defg,255-defg
+			circle x-RoatCirSize,y-RoatCirSize,x+RoatCirSize,y+RoatCirSize,1
+			th(cnt)=th(cnt)+(c+2)*(c+2)
+		} else {
+			active(cnt)=0
+			th(cnt)=0
+		}
+	loop
+	if live=0 : ncount=ncount+1
+		cnt2++
+	} else {
+		cntii++
+		if(cntii==RoatCount){
+			break
+		}
+		cnt2=0
+		ncount=0
+	}
+redraw 1
+await 8
+loop
+dim active:dim th
+return
+
+#global
+RoatCir 14,2,100,100,5,10

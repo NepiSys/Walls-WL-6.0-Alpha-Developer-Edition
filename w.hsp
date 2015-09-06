@@ -1,0 +1,77 @@
+
+
+bx.0=1
+bx.1=1
+
+
+by.0=1
+by.1=2
+bxb.0=1
+bxb.1=1
+
+
+byb.0=1
+byb.1=2
+
+
+x=60.0
+y=x
+Grip=65.0
+フラグ=-1
+
+buffer 1,x,y
+boxf 0,0,x,y
+gsel 0,1
+
+repeat
+getkey click,1
+color 255,255,255:boxf
+
+
+	repeat length(bx)
+		if mousex >= (bx.cnt*Grip) & mousex <= (bx.cnt*Grip)+x & mousey >= (by.cnt*Grip) & mousey <= (by.cnt*Grip)+y & click=1&clickb=0:{
+			title "o"
+			フラグ=cnt
+			ac=1
+			bx.cnt=int(double(mousex)/Grip)//小数点切り捨て。これ重要
+			by.cnt=int(double(mousey)/Grip)
+			bxb.cnt=mousex-25
+			byb.cnt=mousey-25
+
+		}else{
+			title "b
+		}
+		if(ac==1){
+			bx.フラグ=int(double(mousex)/Grip)//小数点切り捨て。これ重要
+			by.フラグ=int(double(mousey)/Grip)
+			bxb.フラグ=mousex-25
+			byb.フラグ=mousey-25
+		}
+	
+	loop
+
+repeat length(bx)
+if( click==0){
+		ac=0
+		pos bx.cnt*Grip,by.cnt*Grip
+		celput 1
+
+		
+}else{
+	if(cnt!=フラグ){
+			pos bx.cnt*Grip,by.cnt*Grip
+			title ""+bx.cnt*Grip
+			celput 1
+	}else{
+			pos bxb.cnt,byb.cnt
+			celput 1
+	}
+}
+loop
+
+redraw 1
+await 15
+redraw 0
+clickB=click
+await
+loop
